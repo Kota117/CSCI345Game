@@ -3,8 +3,10 @@ MACLIBS=-L/opt/homebrew/lib -lSDL2
 SRC=src
 MAINSRC=$(SRC)/main.cpp
 
-MACBIN=bin/macGame
+MACBIN=bin/game
+
+MAC: $(MACBIN)
 
 $(MACBIN):
-	g++ $(MAINSRC) -o bin/game $(MACCFLAGS) $(MACLIBS)
+	g++ $(MAINSRC) -o $(MACBIN) $(MACCFLAGS) $(MACLIBS)
 
