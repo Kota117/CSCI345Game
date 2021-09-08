@@ -8,6 +8,7 @@ LINUXLIBS=-lSDL2
 MACBIN=bin/game
 LINUXBIN=bin/linuxGame
 
+LINUX: $(LINUXBIN)
 MAC: $(MACBIN)
 
 $(LINUXBIN):
