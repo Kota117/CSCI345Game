@@ -26,6 +26,40 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    SDL_Renderer *ren;
+    
+    ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (ren == NULL) {
+		cerr << "Could not create renderer" << endl;
+		return 1;
+	}
+	
+    SDL_Surface *ob;
+    ob = SDL_LoadBMP("media/image.bmp");
+    if (ob == NULL) {
+		cerr << "Could not load media/image.bmp" << endl;
+		return 1;
+	}
+
+    SDL_Rect src, dest;
+	src.w = ob->w;
+	src.h = ob->h;
+	dest.w = src.w;
+	dest.h = src.h;
+	src.x = 0;
+	src.y = 0;
+	dest.x = 0;
+	dest.y = 0;
+
+    SDL_Texture *bitmapTex;
+	bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
+	if (bitmapTex == NULL) {
+		cerr << "Could not create texture" << endl;
+		return 1;
+	}
+	
+	SDL_FreeSurface(ob);
+
     //Had to change to this loop instead of delay to see window on M1
     bool is_running = true;
     SDL_Event event;
@@ -35,10 +69,18 @@ int main(int argc, char* argv[]) {
                 is_running = false;
             }
         }
-        SDL_Delay(16);
+
+    dest.x++;
+	dest.y++;
+	SDL_RenderClear(ren);
+	SDL_RenderCopy(ren, bitmapTex, &src, &dest);
+	SDL_RenderPresent(ren);
+	SDL_Delay(100);
     }
 
     // Close and destroy the window
+    SDL_DestroyTexture(bitmapTex);
+    SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(window);
 
     // Clean up
