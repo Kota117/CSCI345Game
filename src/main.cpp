@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <vector>
 
 using namespace std;
 
@@ -48,7 +49,6 @@ class Game {
             }
 			update(double(newTicks-ticks)/1000.0);
 			ticks=newTicks;
-	    // SDL_Delay(100);
         }
 	}
     virtual void update(double dt/*ms of elapsed time*/)=0;
@@ -60,22 +60,14 @@ class Game {
 };
 
 class Particle {
-	SDL_Renderer *ren;
-	SDL_Texture *bitmapTex;
-	SDL_Rect *src;
 	SDL_Rect dest;
 	double x, y, vx, vy, ax, ay;
+
 	public:
-	Particle(SDL_Renderer *newRen, SDL_Texture *newBitmapTex,
-			 SDL_Rect *newSrc,
-			 double newx=0.0, double newy=0.0,
+	Particle(double newx=0.0, double newy=0.0,
 			 double newvx=0.0, double newvy=0.0,
 			 double newax=0.0, double neway=0.0) {
-		src=newSrc;
-		ren=newRen;
-		bitmapTex=newBitmapTex;
-		dest.w = src->w;
-		dest.h = src->h;
+
 		dest.x = newx;
 		dest.y = newy;
 		x = newx;
@@ -85,48 +77,106 @@ class Particle {
 		ax = newax;
 		ay = neway; // px/s/s
 	}
+
+    SDL_Rect getPosition(){
+        return dest;
+    }
+
 	void update(double dt) {
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
 		dest.x=(int)x;
 		dest.y=(int)y;
-		SDL_RenderCopy(ren, bitmapTex, src, &dest);
 	}
+};
+
+class Graphic{
+    SDL_Renderer *ren;
+	SDL_Texture *bitmapTex;
+	SDL_Rect src, dest;
+
+    double drawTime;
+
+	SDL_Surface *ob;
+    
+    public:
+    Graphic(SDL_Renderer *newRen, 
+            SDL_Rect newSrc,
+            SDL_Rect newDest) {
+        
+        ren=newRen;
+		
+        src=newSrc;
+        dest=newDest;
+
+        dest.h = src.h;
+        dest.w = src.w;
+
+		ob = SDL_LoadBMP("media/Soundwave2white.bmp");
+    	if (ob == NULL) throw Exception("Could not load media/image.bmp");
+		
+        bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
+        if (bitmapTex == NULL) throw Exception("Could not create texture");
+		SDL_FreeSurface(ob);
+	}
+
+    void update(SDL_Rect newDest, double dt){
+        dest=newDest;
+        dest.h = src.h;
+        dest.w = src.w;
+
+		//the drawtime is used to animate the sprite
+        drawTime += dt;
+
+        if(drawTime > (1.0/20.0)){
+            src.x = (src.x + 64) % (64*3);
+            if(src.x==0)
+                src.y = (src.y + 64) % (64*3);
+            drawTime = 0;
+        }
+
+        SDL_RenderCopy(ren, bitmapTex, &src, &dest);
+            
+    }
+
+    ~Graphic(){
+        SDL_DestroyTexture(bitmapTex);
+    }
 };
 
 class MyGame:public Game {
-        SDL_Texture *bitmapTex;
-		SDL_Rect src;
-		Particle *p;
+	vector <Particle*> particles;
+    vector <Graphic*> g;
+    SDL_Rect src, dest;
+
 	public:
 	MyGame(int w=640, int h=480):Game("An SDL2 window", w, h) {
-		SDL_Surface *ob;
-		ob = SDL_LoadBMP("media/image.bmp");
-    	if (ob == NULL) throw Exception("Could not load media/image.bmp");
-		src.w = ob->w;
-		src.h = ob->h;
+        src.w = 64;
+		src.h = 64;
 		src.x = 0;
 		src.y = 0;
-		bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
-		if (bitmapTex == NULL) throw Exception("Could not create texture");
-		SDL_FreeSurface(ob);
-		
-		p = new Particle(ren, bitmapTex, &src, 100, 100, 10, 10, 0, -5);
+
+        for(int i=0; i < 50; i++){
+            double vy = rand() % 100 - 50;
+			double vx = rand() % 100 - 50;
+            particles.push_back(new Particle(100, 100, vx, vy, 0.0, -20.0));
+            g.push_back(new Graphic(ren, src, dest));
+        }
 	}
+
 	void update(double dt) {
-		
 		SDL_RenderClear(ren);
-		p->update(dt);
+        for(unsigned i=0; i<particles.size(); i++){
+            particles[i]->update(dt);
+            g[i]->update(particles[i]->getPosition(), dt);
+        }
 		SDL_RenderPresent(ren);
 	}
 	~MyGame() {
-	    SDL_DestroyTexture(bitmapTex);
+	    
 	}
 };
 int main(int argc, char* argv[]) {
-
-    //Had to change to this loop instead of delay to see window on M1
-
     try {
 		MyGame g;
 		g.run();
