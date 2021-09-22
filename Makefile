@@ -11,12 +11,9 @@ WININCPATH=..\\SDL2-2.0.16\\x86_64-w64-mingw32
 WINFLAGS="-I$(WININCPATH)\\include\\SDL2"
 WINLIBS="-L$(WININCPATH)\\lib" -lmingw32 -lSDL2main -lSDL2
 
-MACBIN=bin/game
-LINUXBIN=bin/game
+BIN=bin/game
 WINBIN=bin/game.exe
 
-linux: $(LINUXBIN)
-mac: $(MACBIN)
 win: $(WINBIN)
 
 run:
@@ -26,11 +23,11 @@ else
 	./bin/game
 endif
 
-$(LINUXBIN): $(MAINSRC)
-		g++ $(MAINSRC) $(LINUXFLAGS) -o $(LINUXBIN) $(LINUXLIBS)
+linux: $(MAINSRC)
+		g++ $(MAINSRC) -o $(BIN) $(LINUXFLAGS) $(LINUXLIBS)
 		
-$(MACBIN): $(MAINSRC)
-	g++ $(MAINSRC) -o $(MACBIN) $(MACCFLAGS) $(MACLIBS)
+mac: $(MAINSRC)
+	g++ $(MAINSRC) -o $(BIN) $(MACCFLAGS) $(MACLIBS)
 
 $(WINBIN): $(MAINSRC)
 	g++.exe $(MAINSRC) -o $(WINBIN) $(WINFLAGS) $(WINLIBS)
