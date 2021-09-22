@@ -13,7 +13,7 @@ WINLIBS="-L$(WININCPATH)\\lib" -lmingw32 -lSDL2main -lSDL2
 
 MACBIN=bin/game
 LINUXBIN=bin/game
-WINBIN=bin\game.exe
+WINBIN=bin/game.exe
 
 linux: $(LINUXBIN)
 mac: $(MACBIN)
