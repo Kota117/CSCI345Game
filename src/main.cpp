@@ -1,6 +1,11 @@
 #include <iostream>
 #include <SDL.h>
 #include <vector>
+#include <time.h>
+
+#include <math.h>
+
+#define PI 3.14159265
 
 using namespace std;
 
@@ -96,24 +101,33 @@ class Graphic{
 	SDL_Rect src, dest;
 
     double drawTime;
+	double animationSpeed;
+
+	int drawnFrames;
 
 	SDL_Surface *ob;
     
     public:
     Graphic(SDL_Renderer *newRen, 
             SDL_Rect newSrc,
-            SDL_Rect newDest) {
+            SDL_Rect newDest,
+			float newAnimationSpeed=20.0) {
         
         ren=newRen;
 		
+		animationSpeed = newAnimationSpeed;
+		drawnFrames = 0;
+
         src=newSrc;
         dest=newDest;
 
         dest.h = src.h;
         dest.w = src.w;
 
-		ob = SDL_LoadBMP("media/Soundwave2white.bmp");
+		ob = SDL_LoadBMP("media/Firework.bmp");
     	if (ob == NULL) throw Exception("Could not load media/image.bmp");
+
+		SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 0, 0));
 		
         bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
         if (bitmapTex == NULL) throw Exception("Could not create texture");
@@ -128,15 +142,17 @@ class Graphic{
 		//the drawtime is used to animate the sprite
         drawTime += dt;
 
-        if(drawTime > (1.0/20.0)){
-            src.x = (src.x + 64) % (64*3);
-            if(src.x==0)
-                src.y = (src.y + 64) % (64*3);
-            drawTime = 0;
-        }
-
-        SDL_RenderCopy(ren, bitmapTex, &src, &dest);
-            
+		if(drawnFrames < 9){
+			if(drawTime > (1.0/animationSpeed)){
+				src.x = (src.x + 64) % (64*3);
+				if(src.x==0)
+					src.y = (src.y + 64) % (64*3);
+				drawTime = 0;
+				drawnFrames++;
+			}
+		}
+		
+        SDL_RenderCopy(ren, bitmapTex, &src, &dest); 
     }
 
     ~Graphic(){
@@ -150,17 +166,20 @@ class MyGame:public Game {
     SDL_Rect src, dest;
 
 	public:
-	MyGame(int w=640, int h=480):Game("An SDL2 window", w, h) {
+	MyGame(int w=640, int h=480):Game("Firework Sim", w, h) {
+		srand(time(0));
         src.w = 64;
 		src.h = 64;
 		src.x = 0;
 		src.y = 0;
 
-        for(int i=0; i < 50; i++){
-            double vy = rand() % 100 - 50;
-			double vx = rand() % 100 - 50;
-            particles.push_back(new Particle(100, 100, vx, vy, 0.0, -20.0));
-            g.push_back(new Graphic(ren, src, dest));
+        for(int i=0; i < 360; i++){
+            double vy = sin (i*PI/180) * 100;
+			double vx = cos (i*PI/180) * 100;
+			
+			double speed = rand() % 20;
+            particles.push_back(new Particle(w/2, h/2, vx, vy, 0.0, 0.0));
+            g.push_back(new Graphic(ren, src, dest, speed));
         }
 	}
 
