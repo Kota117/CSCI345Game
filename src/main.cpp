@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <vector>
+#include <map>
 #include <time.h>
 
 #include <math.h>
@@ -20,8 +21,36 @@ class Exception {
 	}
 };
 
+class MediaManager {
+	map<string,SDL_Texture *> images;
+	SDL_Renderer *ren;
+	public:
+	MediaManager(SDL_Renderer *newRen) {
+		ren=newRen;
+	}
+	SDL_Texture *read(string filename) {
+		SDL_Texture *bitmapTex;
+		if(images.find(filename)==images.end()) {
+			SDL_Surface *ob;
+			ob = SDL_LoadBMP(filename.c_str());
+			if (ob == NULL) throw Exception("Could not load "+filename);
+			bitmapTex = SDL_CreateTextureFromSurface(ren,ob);
+			if (bitmapTex == NULL) throw Exception("Could not create texture");
+			SDL_FreeSurface(ob);
+			images[filename]=bitmapTex;
+		}
+		return images[filename];
+	}
+	~MediaManager() {
+		for(auto i:images) {
+	    	SDL_DestroyTexture(i.second);
+		}
+	}
+};
+
 class Game {
     protected:
+	MediaManager *media;
 	SDL_Window *window;
 	SDL_Renderer *ren;
 	int ticks; //ms ticks since start
@@ -39,6 +68,7 @@ class Game {
         if (window == NULL) throw Exception("Could not create window: ");
 		ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if (ren == NULL) throw Exception("Could not create renderer");
+		media=new MediaManager(ren);
 		ticks=SDL_GetTicks();
 	}
     void run () {
@@ -67,6 +97,7 @@ class Game {
 class Particle {
 	SDL_Rect dest;
 	double x, y, vx, vy, ax, ay;
+	int minx, miny, maxx, maxy;
 
 	public:
 	Particle(double newx=0.0, double newy=0.0,
@@ -81,13 +112,27 @@ class Particle {
 		vy = newvy; // px/s
 		ax = newax;
 		ay = neway; // px/s/s
+		setBound();
 	}
 
     SDL_Rect getPosition(){
         return dest;
     }
-
+	void setBound(int newMinX=0, int newMinY=0, int newMaxX=0, int newMaxY=0) {
+		minx=newMinX;
+		miny=newMinY;
+		maxx=newMaxX;
+		maxy=newMaxY;
+	}
 	void update(double dt) {
+		if (maxx!=minx) {
+			if(x<=minx) { vx=-vx; x=minx; }
+			if(x>=maxx) { vx=-vx; x=maxx; }
+		}
+		if (maxy!=miny) {
+			if(y<=miny) { vy=-vy; y=miny; }
+			if(y>=maxy) { vy=-vy; y=maxy; }
+		}
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
 		dest.x=(int)x;
@@ -124,14 +169,14 @@ class Graphic{
         dest.h = src.h;
         dest.w = src.w;
 
-		ob = SDL_LoadBMP("media/Firework.bmp");
-    	if (ob == NULL) throw Exception("Could not load media/image.bmp");
+	//	ob = SDL_LoadBMP("media/Firework.bmp");
+    //	if (ob == NULL) throw Exception("Could not load media/image.bmp");
 
 		SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 0, 0));
 		
-        bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
-        if (bitmapTex == NULL) throw Exception("Could not create texture");
-		SDL_FreeSurface(ob);
+    //  bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
+    //  if (bitmapTex == NULL) throw Exception("Could not create texture");
+	//	SDL_FreeSurface(ob);
 	}
 
     void update(SDL_Rect newDest, double dt){
@@ -156,7 +201,7 @@ class Graphic{
     }
 
     ~Graphic(){
-        SDL_DestroyTexture(bitmapTex);
+    //    SDL_DestroyTexture(bitmapTex);
     }
 };
 
@@ -178,8 +223,10 @@ class MyGame:public Game {
 			double vx = cos (i*PI/180) * 100;
 			
 			double speed = rand() % 20;
+			SDL_Texture *bitmapTex=media->read("media/Firework.bmp");
             particles.push_back(new Particle(w/2, h/2, vx, vy, 0.0, 0.0));
             g.push_back(new Graphic(ren, src, dest, speed));
+		 	particles[i]->setBound(0,0,w,h);
         }
 	}
 
