@@ -34,6 +34,7 @@ class MediaManager {
 			SDL_Surface *ob;
 			ob = SDL_LoadBMP(filename.c_str());
 			if (ob == NULL) throw Exception("Could not load "+filename);
+			SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 0, 0));
 			bitmapTex = SDL_CreateTextureFromSurface(ren,ob);
 			if (bitmapTex == NULL) throw Exception("Could not create texture");
 			SDL_FreeSurface(ob);
@@ -93,11 +94,13 @@ class Game {
     	SDL_Quit();	
 	}
 };
-
+/*
 class Particle {
 	SDL_Rect dest;
 	double x, y, vx, vy, ax, ay;
 	int minx, miny, maxx, maxy;
+
+	double damp=0.8;
 
 	public:
 	Particle(double newx=0.0, double newy=0.0,
@@ -126,12 +129,12 @@ class Particle {
 	}
 	void update(double dt) {
 		if (maxx!=minx) {
-			if(x<=minx) { vx=-vx; x=minx; }
-			if(x>=maxx) { vx=-vx; x=maxx; }
+			if(x<=minx) { vx=-damp*vx; x=minx; }
+			if(x>=maxx) { vx=-damp*vx; x=maxx; }
 		}
 		if (maxy!=miny) {
-			if(y<=miny) { vy=-vy; y=miny; }
-			if(y>=maxy) { vy=-vy; y=maxy; }
+			if(y<=miny) { vy=-damp*vy; y=miny; }
+			if(y>=maxy) { vy=-damp*vy; y=maxy; }
 		}
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
@@ -169,14 +172,14 @@ class Graphic{
         dest.h = src.h;
         dest.w = src.w;
 
-	//	ob = SDL_LoadBMP("media/Firework.bmp");
-    //	if (ob == NULL) throw Exception("Could not load media/image.bmp");
+		ob = SDL_LoadBMP("media/Firework.bmp");
+    	if (ob == NULL) throw Exception("Could not load media/Firework.bmp");
 
 		SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 0, 0));
 		
-    //  bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
-    //  if (bitmapTex == NULL) throw Exception("Could not create texture");
-	//	SDL_FreeSurface(ob);
+        bitmapTex = SDL_CreateTextureFromSurface(ren, ob);
+        if (bitmapTex == NULL) throw Exception("Could not create texture");
+		SDL_FreeSurface(ob);	
 	}
 
     void update(SDL_Rect newDest, double dt){
@@ -201,17 +204,69 @@ class Graphic{
     }
 
     ~Graphic(){
-    //    SDL_DestroyTexture(bitmapTex);
+        SDL_DestroyTexture(bitmapTex);
     }
 };
+*/
 
+class Particle {
+	SDL_Renderer *ren;
+	SDL_Texture *bitmapTex;
+	SDL_Rect *src;
+	SDL_Rect dest;
+	double x, y, vx, vy, ax, ay;
+	int minx, miny, maxx, maxy;
+
+	public:
+	Particle(SDL_Renderer *newRen, SDL_Texture *newBitmapTex,
+			 SDL_Rect *newSrc,
+			 double newx=0.0, double newy=0.0,
+			 double newvx=0.0, double newvy=0.0,
+			 double newax=0.0, double neway=0.0) {
+		src=newSrc;
+		ren=newRen;
+		bitmapTex=newBitmapTex;
+		dest.w = src->w;
+		dest.h = src->h;
+		dest.x = newx;
+		dest.y = newy;
+		x = newx;
+		y = newy;
+		vx = newvx; // px/s
+		vy = newvy; // px/s
+		ax = newax;
+		ay = neway; // px/s/s
+		setBound();
+	}
+	void setBound(int newMinX=0, int newMinY=0, int newMaxX=0, int newMaxY=0) {
+		minx=newMinX;
+		miny=newMinY;
+		maxx=newMaxX;
+		maxy=newMaxY;
+	}
+	void update(double dt) {
+		if (maxx!=minx) {
+			if(x<=minx) { vx=-vx; x=minx; }
+			if(x>=maxx) { vx=-vx; x=maxx; }
+		}
+		if (maxy!=miny) {
+			if(y<=miny) { vy=-vy; y=miny; }
+			if(y>=maxy) { vy=-vy; y=maxy; }
+		}
+		vx+=ax*dt; vy+=ay*dt;
+		x+=vx*dt; y+=vy*dt;
+		dest.x=(int)x;
+		dest.y=(int)y;
+		SDL_RenderCopy(ren, bitmapTex, src, &dest);
+	}
+};
 class MyGame:public Game {
 	vector <Particle*> particles;
-    vector <Graphic*> g;
+//    vector <Graphic*> g;
     SDL_Rect src, dest;
 
 	public:
-	MyGame(int w=640, int h=480):Game("Firework Sim", w, h) {
+	MyGame(int w=640, int h=480):Game("Reflections", w, h) {
 		srand(time(0));
         src.w = 64;
 		src.h = 64;
@@ -223,10 +278,11 @@ class MyGame:public Game {
 			double vx = cos (i*PI/180) * 100;
 			
 			double speed = rand() % 20;
-			SDL_Texture *bitmapTex=media->read("media/Firework.bmp");
-            particles.push_back(new Particle(w/2, h/2, vx, vy, 0.0, 0.0));
-            g.push_back(new Graphic(ren, src, dest, speed));
-		 	particles[i]->setBound(0,0,w,h);
+			SDL_Texture *bitmapTex=media->read("media/image.bmp");
+		 	SDL_QueryTexture(bitmapTex, NULL, NULL, &src.w, &src.h);
+            particles.push_back(new Particle(ren,bitmapTex,&src,(w-src.w)/2, (h-src.h)/2, vx, vy, 0.0, 0.0));
+//            g.push_back(new Graphic(ren, src, dest, speed));
+		 	particles[i]->setBound(0,0,w-src.w,h-src.h);
         }
 	}
 
@@ -234,7 +290,7 @@ class MyGame:public Game {
 		SDL_RenderClear(ren);
         for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
-            g[i]->update(particles[i]->getPosition(), dt);
+//            g[i]->update(particles[i]->getPosition(), dt);
         }
 		SDL_RenderPresent(ren);
 	}
