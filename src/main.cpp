@@ -15,21 +15,19 @@ using namespace std;
 
 class MyGame:public Game {
 	vector <Particle*> particles;
-    SDL_Rect src, dest;
+    Animation a;
+
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
-		src.x = 0;
-		src.y = 0;
+		a.read(media, "media/sound1.txt");
 
         for(int i=0; i < 360; i++){
             double vy = sin (i*PI/180) * 100;
 			double vx = cos (i*PI/180) * 100;
 
-			SDL_Texture *tex=media->read("media/sound1.bmp");
-		 	SDL_QueryTexture(tex, NULL, NULL, &src.w, &src.h);
-            particles.push_back(new Particle(ren,tex,&src, w/2, h/2, vx, vy, 0.0, 0.0, 0.9));
-		 	particles[i]->setBound(0,0,w-src.w,h-src.h);
+            particles.push_back(new Particle(ren, &a, w/2, h/2, vx, vy, 0.0, 0.0, 0.9));
+		 	particles[i]->setBound(0,0,w-8,h-8);
         }
 	}
 
