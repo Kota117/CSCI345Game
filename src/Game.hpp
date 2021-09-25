@@ -21,9 +21,12 @@ class Game {
         	SDL_WINDOW_OPENGL                  // flags - see below
         );
         if (window == NULL) throw Exception("Could not create window: ");
+		
 		ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if (ren == NULL) throw Exception("Could not create renderer");
+		
 		media=new MediaManager(ren);
+		
 		ticks=SDL_GetTicks();
 	}
 
@@ -31,7 +34,8 @@ class Game {
 		int newTicks;
 		bool is_running = true;
         SDL_Event event;
-        while (is_running) {
+        
+		while (is_running) {
             newTicks=SDL_GetTicks();
             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_QUIT) {
@@ -43,7 +47,7 @@ class Game {
         }
 	}
 
-    virtual void update(double dt/*ms of elapsed time*/)=0;
+    virtual void update(double dt/*s of elapsed time*/)=0;
     
 	~Game(){
     	SDL_DestroyRenderer(ren);

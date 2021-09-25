@@ -4,32 +4,32 @@ using namespace std;
 
 class Particle {
 	SDL_Renderer *ren;
-	SDL_Texture *bitmapTex;
+	SDL_Texture *tex;
 	SDL_Rect *src;
 	SDL_Rect dest;
 	double x, y, vx, vy, ax, ay, damp;
 	int minx, miny, maxx, maxy;
 
 	public:
-	Particle(SDL_Renderer *newRen, SDL_Texture *newBitmapTex,
-			 SDL_Rect *newSrc,
+	Particle(SDL_Renderer *newRen, SDL_Texture *newTex, SDL_Rect *newSrc,
 			 double newx=0.0, double newy=0.0,
 			 double newvx=0.0, double newvy=0.0,
 			 double newax=0.0, double neway=0.0,
 			 double newdamp=1.0) {
 		src=newSrc;
 		ren=newRen;
-		bitmapTex=newBitmapTex;
+		tex=newTex;
+		
 		dest.w = src->w;
 		dest.h = src->h;
+		
 		dest.x = newx;
 		dest.y = newy;
-		x = newx;
-		y = newy;
-		vx = newvx; // px/s
-		vy = newvy; // px/s
-		ax = newax;
-		ay = neway; // px/s/s
+		
+		x = newx; y = newy;
+		vx = newvx; vy = newvy; // px/s
+		ax = newax; ay = neway; // px/s/s
+		
 		damp=newdamp;
 		setBound();
 	}
@@ -52,8 +52,10 @@ class Particle {
 		}
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
+
 		dest.x=(int)x;
 		dest.y=(int)y;
-		SDL_RenderCopy(ren, bitmapTex, src, &dest);
+		
+		SDL_RenderCopy(ren, tex, src, &dest);
 	}
 };

@@ -12,17 +12,24 @@ class MediaManager {
 	}
     
 	SDL_Texture *read(string filename) {
-		SDL_Texture *bitmapTex;
+		SDL_Texture *tex;
+
 		if(images.find(filename)==images.end()) {
 			SDL_Surface *ob;
+			
 			ob = SDL_LoadBMP(filename.c_str());
 			if (ob == NULL) throw Exception("Could not load "+filename);
-			SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 0, 0));
-			bitmapTex = SDL_CreateTextureFromSurface(ren,ob);
-			if (bitmapTex == NULL) throw Exception("Could not create texture");
+			
+			SDL_SetColorKey(ob, SDL_TRUE, SDL_MapRGB(ob->format, 0, 255, 0));
+			
+			tex = SDL_CreateTextureFromSurface(ren,ob);
+			if (tex == NULL) throw Exception("Could not create texture");
+			
 			SDL_FreeSurface(ob);
-			images[filename]=bitmapTex;
+			
+			images[filename]=tex;
 		}
+		
 		return images[filename];
 	}
 
