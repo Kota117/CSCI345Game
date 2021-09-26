@@ -28,8 +28,8 @@ class MyGame:public Game {
             double vy = sin (i*PI/180) * 100;
 			double vx = cos (i*PI/180) * 100;
 
-            particles.push_back(new Particle(ren, &brightSound, w/2, h/2, vx, vy, 0.0, 0.0, 0.9));
-		 	particles[i]->setBound(0,0,w-8,h-8);
+            particles.push_back(new Particle(ren, &brightSound, w/2, h/2, vx, vy, 0.0, 0.0, 1.0));
+		 	particles[i]->setBound(0,100,0,h-100);
         }
 	}
 
