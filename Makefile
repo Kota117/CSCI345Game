@@ -32,7 +32,7 @@ else
 endif
 
 $(LINBIN): $(MAINSRC) $(HEADERS)
-		g++ $(MAINSRC) -o $(BIN) $(LINUXFLAGS) $(LINUXLIBS)
+		g++ $(MAINSRC) -o $(LINBIN) $(LINUXFLAGS) $(LINUXLIBS)
 		
 $(MACBIN): $(MAINSRC) $(HEADERS)
 	g++ -std=c++11 $(MAINSRC) -o $(MACBIN) $(MACCFLAGS) $(MACLIBS)
