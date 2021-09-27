@@ -31,6 +31,7 @@ class Animation{
 	int currentTime;
 
 	string sheetName;
+	string animationFile;
 
 	public:
 	Animation() { 
@@ -38,26 +39,28 @@ class Animation{
 	  currentTime=0;
 	}
 
-	void read(MediaManager *media,string file) {
-		int max;
-		ifstream in;
+	void read(MediaManager *media,string newAnimationFile) {
+		if(newAnimationFile != animationFile){
+			animationFile = newAnimationFile;
 
-		cout << file << endl;
+			int max;
+			ifstream in;
 
-		in.open(file);
+			in.open(animationFile);
 
-		in >> max >> sheetName;
-		spriteSheet=media->read("media/"+sheetName+".bmp");
-		
-		int millis,x,y,w,h;
-		for (int i=0;i<max;i++) {
-			in >> millis >> x >> y >> w >> h;
-			AnimationFrame *af=new AnimationFrame(millis, x, y, w, h);
+			in >> max >> sheetName;
+			spriteSheet=media->read("media/"+sheetName+".bmp");
 			
-			frames.push_back(af);
-			totalTime+=af->getMillis(); 
-		}
-		in.close();
+			int millis,x,y,w,h;
+			for (int i=0;i<max;i++) {
+				in >> millis >> x >> y >> w >> h;
+				AnimationFrame *af=new AnimationFrame(millis, x, y, w, h);
+				
+				frames.push_back(af);
+				totalTime+=af->getMillis(); 
+			}
+			in.close();
+		}	
 	}
 
 	void update(double dt) {
@@ -81,6 +84,7 @@ class Animation{
 	SDL_Texture *getTexture(){ return spriteSheet; }
 
 	~Animation() {
+		//cout << "Destroying Animation" << endl;
 		for (auto f:frames) 
 		  delete f;
 	}

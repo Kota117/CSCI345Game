@@ -9,40 +9,58 @@
 #include "Game.hpp"
 #include "Particle.hpp"
 #include "Animation.hpp"
-
-#define PI 3.14159265
+#include "Wave.hpp"
 
 using namespace std;
 
 class MyGame:public Game {
-	vector <Particle*> particles;
-    Animation brightSound, midSound, dimSound;
+	vector <Wave *> waves;
+
+	//These two variables are not useful for the game
+	//These were put here to test wave mechanics and should be removed when player physics are added
+	int totalTime;
+	int waveStartX;
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
-		brightSound.read(media, "media/sound1.txt");
-		midSound.read(media, "media/sound2.txt");
-		dimSound.read(media, "media/sound3.txt");
-
-        for(int i=0; i < 360; i++){
-            double vy = sin (i*PI/180) * 100;
-			double vx = cos (i*PI/180) * 100;
-
-            particles.push_back(new Particle(ren, &brightSound, w/2, h/2, vx, vy, 0.0, 0.0, 1.0));
-		 	particles[i]->setBound(0,100,0,h-100);
-        }
+		totalTime = 0.0;
+		waveStartX = 0;
 	}
 
 	void update(double dt) {
 		SDL_RenderClear(ren);
-        for(unsigned i=0; i<particles.size(); i++){
-            particles[i]->update(dt);
-        }
+
+		if(totalTime > 1000){
+			waves.push_back(new Wave(ren, media, waveStartX, 480/2));
+			waveStartX+=100;
+			totalTime%=500;
+			if(waveStartX > 640)
+				waveStartX %= 640;
+		}
+
+		totalTime += (int)(dt*1000.0);
+
+		if(waves.size() > 0){
+
+			for(int i=0; i < waves.size(); i++){
+				waves[i]->update(dt);
+
+				if(waves[i]->getTimeAlive() > 3.0){
+					delete waves[i];
+					waves.erase(waves.begin()+i);
+				}else if(waves[i]->getTimeAlive() > 2.0)
+					waves[i]->setAnimation("media/sound3.txt");
+				else if(waves[i]->getTimeAlive() > 1.0)
+					waves[i]->setAnimation("media/sound2.txt");
+				
+			}
+		}
+		
 		SDL_RenderPresent(ren);
 	}
 
 	~MyGame() {
-	    
+
 	}
 };
 
