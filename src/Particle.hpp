@@ -18,13 +18,16 @@ class Particle {
 			 double newx=0.0, double newy=0.0,
 			 double newvx=0.0, double newvy=0.0,
 			 double newax=0.0, double neway=0.0,
-			 double newdamp=1.0) {
+			 double newdamp=1.0,
+			 //The placement of these W and H params needs to be thought out better
+			 //Maybe we should add a W/H getter method to the Animation/AnimationFrame class
+			 int newW=8, int newH=8) {
 		
 		ren=newRen;
 		a=newA;
 		
-		dest.w = 8;
-		dest.h = 8;
+		dest.w = newW;
+		dest.h = newH;
 		
 		dest.x = newx;
 		dest.y = newy;
@@ -45,6 +48,9 @@ class Particle {
 	}
 
 	void setAnimation(Animation *newA){ a=newA; }
+
+	void setX(double newX) { x=newX; }
+	double getX() { return x; }
 	
 	void update(double dt) {
 		if (maxx!=minx) {

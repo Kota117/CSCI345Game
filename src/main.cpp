@@ -53,21 +53,31 @@ class MyGame:public Game {
 
 	Waves *wavs;
 
+	Animation playerWalking;
+	Particle *player;
+
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		totalTime = 0.0;
-		waveStartX = 0;
+		waveStartX = 32;
 		wavs = new Waves(media, ren);
+
+		playerWalking.read(media, "media/walkRight.txt");
+
+		player = new Particle(ren, &playerWalking, 0, (480/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
 	}
 
 	void update(double dt) {
 		SDL_RenderClear(ren);
 
 		if(totalTime > 1000){
-			waveStartX+=100;
+			waveStartX+=50;
 			totalTime%=500;
-			if(waveStartX > 640)
+			if(waveStartX > 640){
 				waveStartX %= 640;
+				player->setX((int)(player->getX())%640);
+			}
+			
 
 			wavs->createWave(waveStartX, 480/2);
 		}
@@ -75,6 +85,8 @@ class MyGame:public Game {
 		totalTime += (int)(dt*1000.0);
 
 		wavs->updateWaves(dt);
+
+		player->update(dt);
 		
 		SDL_RenderPresent(ren);
 	}
