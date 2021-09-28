@@ -8,6 +8,8 @@ class Particle {
 	SDL_Renderer *ren;
 	Animation *a;
 	SDL_Rect dest;
+
+	protected:
 	double x, y, vx, vy, ax, ay, damp;
 	int minx, miny, maxx, maxy;
 
@@ -64,3 +66,52 @@ class Particle {
 		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
 };
+
+//PLAYER CLASS WIP
+
+// class Player:public Particle{
+// 	double walkSpeed = 5;
+
+// 	Animation playerAnim;
+// 	MediaManager *media;
+// 	Waves *wavs;
+
+// 	public:
+// 	Player(MediaManager *media, SDL_Renderer *newRen, Animation *newA,
+// 		Waves *newWavs,
+// 		double newx=0.0, double newy=0.0,
+// 		double newvx=0.0, double newvy=0.0,
+// 		double newax=0.0, double neway=0.0,
+// 		double newdamp=0.0):Particle(newRen, newA, 
+// 							newx, newy, newvx, newvy, newax, neway, newdamp){
+
+// 		//The above is constructing a Player object as a particle with some default params
+// 		wavs = newWavs;
+// 		playerAnim.read(media, "stand.txt");
+// 	}
+
+// 	//Put some registered handlers down here
+
+// 	void setAnimation(string filePath){
+// 		playerAnim.read(media, filePath);
+// 	}
+
+// 	void walkRight(){
+// 		vx = walkSpeed;
+// 		setAnimation("media/walkRight.txt");
+// 		wavs->createWave(x, y);
+// 	}
+
+// 	void update(){
+		
+// 		Partice:update();
+// 	}
+	
+// 	// double getX() { return x; }
+// 	// double getY() { return y; }
+
+// 	// void setVX(double newVX) { vx = newVX; }
+// 	// void setVY(double newVY) { vy = newVY; }
+
+
+// };
