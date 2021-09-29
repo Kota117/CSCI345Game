@@ -65,7 +65,7 @@ class Particle {
 
 		if (maxx!=minx) {
 			if (x<=minx) { 
-				if (180<=theta<270)
+				if (180<= theta && theta <270)
 					theta=540-theta;
 				else 
 					theta=180-theta;
@@ -73,7 +73,7 @@ class Particle {
 				x=minx;
 			}
 			if (x>=maxx) { 
-				if (270<theta<=360)
+				if (270<theta && theta<=360)
 					theta=540-theta;
 				else 
 					theta=180-theta;
