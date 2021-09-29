@@ -13,39 +13,26 @@
 
 using namespace std;
 
-class MyGame:public Game {
+class Waves{
+	SDL_Renderer *ren;
+	MediaManager *media;
 	vector <Wave *> waves;
 
-	//These two variables are not useful for the game
-	//These were put here to test wave mechanics and should be removed when player physics are added
-	int totalTime;
-	int waveStartX;
-
 	public:
-	MyGame(int w=640, int h=480):Game("Echos", w, h) {
-		totalTime = 0.0;
-		waveStartX = 0;
+	Waves(MediaManager *newMedia, SDL_Renderer *newRen){
+		media=newMedia;
+		ren=newRen;
 	}
 
-	void update(double dt) {
-		SDL_RenderClear(ren);
+	void createWave(int startingX, int startingY){
+		waves.push_back(new Wave(ren, media, startingX, startingY));
+	}
 
-		if(totalTime > 1000){
-			waves.push_back(new Wave(ren, media, waveStartX, 480/2));
-			waveStartX+=100;
-			totalTime%=500;
-			if(waveStartX > 640)
-				waveStartX %= 640;
-		}
-
-		totalTime += (int)(dt*1000.0);
-
+	void updateWaves(double dt){
 		if(waves.size() > 0){
-
 			for(int i=0; i < waves.size(); i++){
 				waves[i]->update(dt);
-
-				if(waves[i]->getTimeAlive() > 3.0){
+				if(waves[i]->getTimeAlive() > 4.0){
 					delete waves[i];
 					waves.erase(waves.begin()+i);
 				}else if(waves[i]->getTimeAlive() > 2.0)
@@ -55,9 +42,66 @@ class MyGame:public Game {
 				
 			}
 		}
+	}
+};
+
+class MyGame:public Game {
+	//These two variables are not useful for the game
+	//These were put here to test wave mechanics and should be removed when player physics are added
+	int totalTime;
+	int waveStartX;
+
+	Waves *wavs;
+
+	Animation playerWalkingRight, playerWalkingLeft;
+	Particle *player;
+
+	public:
+	MyGame(int w=640, int h=480):Game("Echos", w, h) {
+		totalTime = 0.0;
+		waveStartX = 0;
+		wavs = new Waves(media, ren);
+
+		playerWalkingRight.read(media, "media/walkRight.txt");
+		playerWalkingLeft.read(media, "media/walkLeft.txt");
+
+		player = new Particle(ren, &playerWalkingRight, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
+	}
+
+	void update(double dt) {
+		SDL_RenderClear(ren);
+
+		if(totalTime > 1000){
+			waveStartX=64;
+			totalTime%=500;
+
+			wavs->createWave(player->getX()+32, player->getY()+64);
+		}
+
+		if(player->getX() > (640-64)){
+			player->setVX(-(player->getVX()));
+			player->setAnimation(&playerWalkingLeft);
+		}else if(player->getX() < 0){
+			player->setVX(-(player->getVX()));
+			player->setAnimation(&playerWalkingRight);
+		}
+			
+
+
+		totalTime += (int)(dt*1000.0);
+
+		wavs->updateWaves(dt);
+
+		player->update(dt);
 		
 		SDL_RenderPresent(ren);
 	}
+
+	// Do some event handling
+	// On right key down, walk player right
+	// On right key up, set velocity 0
+
+	// mirror for left
 
 	~MyGame() {
 
