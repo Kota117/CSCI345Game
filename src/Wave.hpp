@@ -24,12 +24,14 @@ class Wave{
 
 		setAnimation("media/sound1.txt");
 
+		int angle = 0;
 		for(int i=0; i < 180; i++){
-            double vy = sin (i*PI/180) * 100;
-			double vx = cos (i*PI/180) * 100;
+			angle = i+180;
+            double vy = sin (angle*PI/180) * 100;
+			double vx = cos (angle*PI/180) * 100;
 
-            particles.push_back(new Particle(ren, &a, startX, startY, vx, vy, 0.0, 0.0, 1.0));
-		 	particles[i]->setBound(0,startY-100,0,startY);
+            particles.push_back(new Particle(ren, &a, startX, startY, vx, vy, 0.0, 0.0, 0.5));
+		 	particles[i]->setBound(0,startY-100,0,startY+1);
         }
 	}
 

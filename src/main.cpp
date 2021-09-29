@@ -32,12 +32,12 @@ class Waves{
 		if(waves.size() > 0){
 			for(int i=0; i < waves.size(); i++){
 				waves[i]->update(dt);
-				if(waves[i]->getTimeAlive() > 2.0){
+				if(waves[i]->getTimeAlive() > 4.0){
 					delete waves[i];
 					waves.erase(waves.begin()+i);
-				}else if(waves[i]->getTimeAlive() > 1.0)
+				}else if(waves[i]->getTimeAlive() > 2.0)
 					waves[i]->setAnimation("media/sound3.txt");
-				else if(waves[i]->getTimeAlive() > 0.5)
+				else if(waves[i]->getTimeAlive() > 1.0)
 					waves[i]->setAnimation("media/sound2.txt");
 				
 			}
@@ -53,34 +53,40 @@ class MyGame:public Game {
 
 	Waves *wavs;
 
-	Animation playerWalking;
+	Animation playerWalkingRight, playerWalkingLeft;
 	Particle *player;
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		totalTime = 0.0;
-		waveStartX = 32;
+		waveStartX = 0;
 		wavs = new Waves(media, ren);
 
-		playerWalking.read(media, "media/walkRight.txt");
+		playerWalkingRight.read(media, "media/walkRight.txt");
+		playerWalkingLeft.read(media, "media/walkLeft.txt");
 
-		player = new Particle(ren, &playerWalking, 0, (480/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
+		player = new Particle(ren, &playerWalkingRight, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
 	}
 
 	void update(double dt) {
 		SDL_RenderClear(ren);
 
 		if(totalTime > 1000){
-			waveStartX+=50;
+			waveStartX=64;
 			totalTime%=500;
-			if(waveStartX > 640){
-				waveStartX %= 640;
-				player->setX((int)(player->getX())%640);
-			}
+
+			wavs->createWave(player->getX()+32, player->getY()+64);
+		}
+
+		if(player->getX() > (640-64)){
+			player->setVX(-(player->getVX()));
+			player->setAnimation(&playerWalkingLeft);
+		}else if(player->getX() < 0){
+			player->setVX(-(player->getVX()));
+			player->setAnimation(&playerWalkingRight);
+		}
 			
 
-			wavs->createWave(waveStartX, 480/2);
-		}
 
 		totalTime += (int)(dt*1000.0);
 

@@ -49,8 +49,12 @@ class Particle {
 
 	void setAnimation(Animation *newA){ a=newA; }
 
+	void setVX(double newVX) { vx=newVX; }
+	double getVX() { return vx; }
+
 	void setX(double newX) { x=newX; }
 	double getX() { return x; }
+	double getY() { return y; }
 	
 	void update(double dt) {
 		if (maxx!=minx) {
