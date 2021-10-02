@@ -4,14 +4,25 @@ using namespace std;
 
 class MediaManager {
 	map<string,SDL_Texture *> images;
+	map<string,Mix_Chunk *> samples;
 	SDL_Renderer *ren;
 
 	public:
 	MediaManager(SDL_Renderer *newRen) {
 		ren=newRen;
 	}
-    
-	SDL_Texture *read(string filename) {
+
+    Mix_Chunk *readSound(string filename) {
+	  if (samples.find(filename)==samples.end()) {
+		Mix_Chunk *sample;
+		sample=Mix_LoadWAV(filename.c_str());
+		if(!sample)  throw Exception ("Mix_LoadWAV: "+filename);
+	    samples[filename]=sample;
+	  }
+	  return samples[filename];
+	}
+
+	SDL_Texture *readImage(string filename) {
 		SDL_Texture *tex;
 
 		if(images.find(filename)==images.end()) {
@@ -34,8 +45,7 @@ class MediaManager {
 	}
 
 	~MediaManager() {
-		for(auto i:images) {
-	    	SDL_DestroyTexture(i.second);
-		}
+		for(auto i:images)	SDL_DestroyTexture(i.second);
+	    for(auto i:samples)	Mix_FreeChunk(i.second);
 	}
 };

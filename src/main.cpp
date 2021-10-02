@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <vector>
 #include <map>
 #include <math.h>
@@ -24,8 +25,9 @@ class Waves{
 		ren=newRen;
 	}
 
-	void createWave(int startingX, int startingY){
+	void createWave(Mix_Chunk *sound, int startingX, int startingY){
 		waves.push_back(new Wave(ren, media, startingX, startingY));
+		Mix_PlayChannel(-1,sound,0);
 	}
 
 	void updateWaves(double dt){
@@ -56,6 +58,8 @@ class MyGame:public Game {
 	Animation playerWalkingRight, playerWalkingLeft;
 	Particle *player;
 
+	Mix_Chunk *sample;
+
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		totalTime = 0.0;
@@ -64,6 +68,8 @@ class MyGame:public Game {
 
 		playerWalkingRight.read(media, "media/walkRight.txt");
 		playerWalkingLeft.read(media, "media/walkLeft.txt");
+
+		sample=media->readSound("media/footstep.wav");
 
 		player = new Particle(ren, &playerWalkingRight, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
 	}
@@ -75,7 +81,7 @@ class MyGame:public Game {
 			waveStartX=64;
 			totalTime%=500;
 
-			wavs->createWave(player->getX()+32, player->getY()+64);
+			wavs->createWave(sample, player->getX()+32, player->getY()+64);
 		}
 
 		if(player->getX() > (640-64)){

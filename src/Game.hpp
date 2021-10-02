@@ -11,7 +11,7 @@ class Game {
 
     public:
     Game(string title, int w=640, int h=480){
-		SDL_Init(SDL_INIT_VIDEO); 
+		SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO); 
 		window = SDL_CreateWindow(
         	title.c_str(),                     // window title
         	SDL_WINDOWPOS_UNDEFINED,           // initial x position
@@ -25,6 +25,9 @@ class Game {
 		ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if (ren == NULL) throw Exception("Could not create renderer");
 		
+		if (Mix_Init(0)!=0) throw Exception("Mixer Error");
+        if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) throw Exception("Open Audio Failed");
+
 		media=new MediaManager(ren);
 		
 		ticks=SDL_GetTicks();

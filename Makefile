@@ -3,7 +3,7 @@ MAINSRC=$(SRC)/main.cpp
 HEADERS= $(SRC)/Exception.hpp $(SRC)/Game.hpp $(SRC)/MediaManager.hpp $(SRC)/Particle.hpp $(SRC)/Animation.hpp $(SRC)/Wave.hpp
 
 LINUXFLAGS=-I/usr/include/SDL2 -D_REENTRANT
-LINUXLIBS=-lSDL2
+LINUXLIBS=-lSDL2 -lSDL2_mixer
 
 MACCFLAGS=-I/opt/homebrew/include/SDL2 -D_THREAD_SAFE
 MACLIBS=-L/opt/homebrew/lib -lSDL2

@@ -49,7 +49,7 @@ class Animation{
 			in.open(animationFile);
 
 			in >> max >> sheetName;
-			spriteSheet=media->read("media/"+sheetName+".bmp");
+			spriteSheet=media->readImage("media/"+sheetName+".bmp");
 			
 			int millis,x,y,w,h;
 			for (int i=0;i<max;i++) {
