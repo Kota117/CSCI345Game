@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <math.h>
+#include <map>
 
 #include "Exception.hpp"
 #include "MediaManager.hpp"
@@ -17,7 +18,7 @@ using namespace std;
 class Player:public Particle{
 	double walkSpeed;
 
-	Animation playerAnim;
+	map<string,Animation *> playerAnimations;
 	Waves *waves;
 	Mix_Chunk *footstepSound;
 
@@ -25,12 +26,12 @@ class Player:public Particle{
 	int timeMoving;
 
 	public:
-	Player(SDL_Renderer *newRen, Animation *newA, Waves *newWaves,
+	Player(SDL_Renderer *newRen, map<string,Animation *> newPlayerAnimations, Animation* startingAnimation, Waves *newWaves,
 		Mix_Chunk *newFootstepSound,
 		double newx=0.0, double newy=0.0,
 		double newvx=0.0, double newvy=0.0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newRen, newA, 
+		double newdamp=0.0):Particle(newRen, startingAnimation, 
 							newx, newy, newvx, newvy, newax, neway, newdamp){
 
 		//The above is constructing a Player object as a particle with some default params
@@ -45,19 +46,23 @@ class Player:public Particle{
 
 		waves = newWaves;
 		footstepSound = newFootstepSound;
+		playerAnimations = newPlayerAnimations;
 	}
 
 	//Put some registered handlers down here
 
 	void walkRight(){
 		v = walkSpeed;
+		theta = 0;
 		moving = true;
-		//setAnimation("media/walkRight.txt");
+		setAnimation(playerAnimations["walkRight"]);
 	}
 
 	void walkLeft(){
-		v = -walkSpeed;
+		v = walkSpeed;
+		theta = 180;
 		moving = true;
+		setAnimation(playerAnimations["walkLeft"]);
 	}
 
 	void stopMoving(){
@@ -98,10 +103,26 @@ class MyGame:public Game {
 
 	Waves *waves;
 
-	Animation playerWalkingRight, playerWalkingLeft;
 	Player *player;
+	map<string,Animation *> playerAnimations;
 
 	Mix_Chunk *sample;
+
+
+	void initPlayer(){
+		playerAnimations["walkRight"] = new Animation();
+		playerAnimations["walkRight"]->read(media, "media/walkRight.txt");
+
+		playerAnimations["walkLeft"] = new Animation();
+		playerAnimations["walkLeft"]->read(media, "media/walkLeft.txt");
+
+		playerAnimations["idle"] = new Animation();
+		playerAnimations["idle"]->read(media, "media/idle.txt");
+
+		sample=media->readSound("media/footstep.wav");
+
+		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, sample, 320, (480/2)-64);
+	}
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
@@ -109,15 +130,7 @@ class MyGame:public Game {
 		waveStartX = 0;
 		waves = new Waves(media, ren);
 
-		playerWalkingRight.read(media, "media/walkRight.txt");
-		playerWalkingLeft.read(media, "media/walkLeft.txt");
-
-		sample=media->readSound("media/footstep.wav");
-
-		//ren, &playerWalkingRight, &waves, sample, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0
-		player = new Player(ren, &playerWalkingRight, waves, sample, 0, (480/2)-64, 0.0);
-
-		player->walkRight();
+		initPlayer();
 	}
 
 	void update(double dt) {
