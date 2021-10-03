@@ -12,104 +12,22 @@
 #include "Particle.hpp"
 #include "Animation.hpp"
 #include "Wave.hpp"
+#include "Player.hpp"
 
 using namespace std;
 
-class Player:public Particle{
-	double walkSpeed;
-
-	map<string,Animation *> playerAnimations;
-	Waves *waves;
-	Mix_Chunk *footstepSound;
-
-	bool moving;
-	int timeMoving;
-
-	public:
-	Player(SDL_Renderer *newRen, map<string,Animation *> newPlayerAnimations, Animation* startingAnimation, Waves *newWaves,
-		Mix_Chunk *newFootstepSound,
-		double newx=0.0, double newy=0.0,
-		double newvx=0.0, double newvy=0.0,
-		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newRen, startingAnimation, 
-							newx, newy, newvx, newvy, newax, neway, newdamp){
-
-		//The above is constructing a Player object as a particle with some default params
-		
-		//the placement of these should be better thought out!
-		dest.w=64;
-		dest.h=64;
-
-		moving=false;
-		timeMoving=0;
-		walkSpeed = 50.0;
-
-		waves = newWaves;
-		footstepSound = newFootstepSound;
-		playerAnimations = newPlayerAnimations;
-	}
-
-	//Put some registered handlers down here
-
-	void walkRight(){
-		v = walkSpeed;
-		theta = 0;
-		moving = true;
-		setAnimation(playerAnimations["walkRight"]);
-	}
-
-	void walkLeft(){
-		v = walkSpeed;
-		theta = 180;
-		moving = true;
-		setAnimation(playerAnimations["walkLeft"]);
-	}
-
-	void stopMoving(){
-		vx=0;
-		timeMoving=0;
-	}
-
-	void update(double dt){
-		a->update(dt);
-
-		if(timeMoving > 1000){
-			timeMoving%=500;
-			waves->createWave(footstepSound, x+32, y+64);
-		}
-
-		if(moving)
-			timeMoving += (int)(dt*1000.0);
-
-		vx=v*cos(theta*PI/180); 
-		vy=v*sin(theta*PI/180);
-
-		vx+=ax*dt; vy+=ay*dt;
-		x+=vx*dt; y+=vy*dt;
-
-		dest.x=(int)x;
-		dest.y=(int)y;
-		
-		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
-	}
-
-};
-
 class MyGame:public Game {
-	//These two variables are not useful for the game
-	//These were put here to test wave mechanics and should be removed when player physics are added
-	int totalTime;
-	int waveStartX;
-
 	Waves *waves;
 
 	Player *player;
+
 	map<string,Animation *> playerAnimations;
+	map<string,Mix_Chunk *> playerSounds;
 
 	Mix_Chunk *sample;
 
-
 	void initPlayer(){
+		//this list of actions could be setup in a config file
 		playerAnimations["walkRight"] = new Animation();
 		playerAnimations["walkRight"]->read(media, "media/walkRight.txt");
 
@@ -119,38 +37,54 @@ class MyGame:public Game {
 		playerAnimations["idle"] = new Animation();
 		playerAnimations["idle"]->read(media, "media/idle.txt");
 
-		sample=media->readSound("media/footstep.wav");
+		playerSounds["footstep"] = new Mix_Chunk();
+		playerSounds["footstep"]=media->readSound("media/footstep.wav");
 
-		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, sample, 320, (480/2)-64);
+		playerSounds["clap"] = new Mix_Chunk();
+		playerSounds["clap"]=media->readSound("media/clap.wav");
+
+		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, playerSounds, 320, (480/2)-64);
 	}
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
-		totalTime = 0.0;
-		waveStartX = 0;
 		waves = new Waves(media, ren);
-
 		initPlayer();
 	}
 
 	void update(double dt) {
 		SDL_RenderClear(ren);
 
-		player->update(dt);
-
 		waves->updateWaves(dt);
+
+		player->update(dt);
 		 
 		SDL_RenderPresent(ren);
 	}
 
-	// Do some event handling
-	// On right key down, walk player right
-	// On right key up, set velocity 0
+	void handleKeyUp(SDL_Event keyEvent) {
+		if (keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT ||
+			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT
+		){
+			player->stopMoving();
+		}	
+	}
 
-	// mirror for left
+	void handleKeyDown(SDL_Event keyEvent) {
+		if(!player->isMoving()){
+			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT)
+				player->walkLeft();
+			else if(keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT)
+				player->walkRight();
+		}
+		
+		if(keyEvent.key.keysym.sym==SDLK_e)
+			player->clap();
+	}
 
 	~MyGame() {
-
+		delete player;
+		delete waves;
 	}
 };
 

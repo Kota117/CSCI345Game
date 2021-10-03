@@ -36,14 +36,15 @@ class Game {
     void run () {
 		int newTicks;
 		bool is_running = true;
-        SDL_Event event;
+        SDL_Event e;
         
 		while (is_running) {
             newTicks=SDL_GetTicks();
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
+            while (SDL_PollEvent(&e)) {
+                if (e.type == SDL_QUIT) 
                     is_running = false;
-                }
+                else if (e.type==SDL_KEYDOWN) handleKeyDown(e);
+          		else if (e.type==SDL_KEYUP) handleKeyUp(e);
             }
 			update(double(newTicks-ticks)/1000.0);
 			ticks=newTicks;
@@ -51,6 +52,9 @@ class Game {
 	}
 
     virtual void update(double dt/*s of elapsed time*/)=0;
+
+	virtual void handleKeyUp(SDL_Event key)=0;
+	virtual void handleKeyDown(SDL_Event key)=0;
     
 	~Game(){
     	SDL_DestroyRenderer(ren);
