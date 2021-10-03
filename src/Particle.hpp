@@ -7,6 +7,7 @@
 using namespace std;
 
 class Particle {
+	protected:
 	SDL_Renderer *ren;
 	Animation *a;
 	SDL_Rect dest;
@@ -18,16 +19,13 @@ class Particle {
 			 double newx=0.0, double newy=0.0,
 			 double newv=0.0, int newtheta=0,
 			 double newax=0.0, double neway=0.0,
-			 double newdamp=1.0,
-			 //The placement of these W and H params needs to be thought out better
-			 //Maybe we should add a W/H getter method to the Animation/AnimationFrame class
-			 int newW=8, int newH=8) {
+			 double newdamp=1.0) {
 		
 		ren=newRen;
 		a=newA;
 		
-		dest.w = newW;
-		dest.h = newH;
+		dest.w = 8;
+		dest.h = 8;
 		
 		dest.x = newx;
 		dest.y = newy;
@@ -54,15 +52,11 @@ class Particle {
 
 	void setAnimation(Animation *newA){ a=newA; }
 
-	void setVX(double newVX) { vx=newVX; }
-	double getVX() { return vx; }
-
 	void setX(double newX) { x=newX; }
 	double getX() { return x; }
 	double getY() { return y; }
-	
-	void update(double dt) {
 
+	virtual void update(double dt) {
 		if (maxx!=minx) {
 			if (x<=minx) { 
 				if (180<= theta && theta <270)
@@ -106,52 +100,3 @@ class Particle {
 		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
 };
-
-//PLAYER CLASS WIP
-
-// class Player:public Particle{
-// 	double walkSpeed = 5;
-
-// 	Animation playerAnim;
-// 	MediaManager *media;
-// 	Waves *wavs;
-
-// 	public:
-// 	Player(MediaManager *media, SDL_Renderer *newRen, Animation *newA,
-// 		Waves *newWavs,
-// 		double newx=0.0, double newy=0.0,
-// 		double newvx=0.0, double newvy=0.0,
-// 		double newax=0.0, double neway=0.0,
-// 		double newdamp=0.0):Particle(newRen, newA, 
-// 							newx, newy, newvx, newvy, newax, neway, newdamp){
-
-// 		//The above is constructing a Player object as a particle with some default params
-// 		wavs = newWavs;
-// 		playerAnim.read(media, "stand.txt");
-// 	}
-
-// 	//Put some registered handlers down here
-
-// 	void setAnimation(string filePath){
-// 		playerAnim.read(media, filePath);
-// 	}
-
-// 	void walkRight(){
-// 		vx = walkSpeed;
-// 		setAnimation("media/walkRight.txt");
-// 		wavs->createWave(x, y);
-// 	}
-
-// 	void update(){
-		
-// 		Partice:update();
-// 	}
-	
-// 	// double getX() { return x; }
-// 	// double getY() { return y; }
-
-// 	// void setVX(double newVX) { vx = newVX; }
-// 	// void setVY(double newVY) { vy = newVY; }
-
-
-// };

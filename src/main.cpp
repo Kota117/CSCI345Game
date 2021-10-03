@@ -14,37 +14,80 @@
 
 using namespace std;
 
-class Waves{
-	SDL_Renderer *ren;
-	MediaManager *media;
-	vector <Wave *> waves;
+class Player:public Particle{
+	double walkSpeed;
+
+	Animation playerAnim;
+	Waves *waves;
+	Mix_Chunk *footstepSound;
+
+	bool moving;
+	int timeMoving;
 
 	public:
-	Waves(MediaManager *newMedia, SDL_Renderer *newRen){
-		media=newMedia;
-		ren=newRen;
+	Player(SDL_Renderer *newRen, Animation *newA, Waves *newWaves,
+		Mix_Chunk *newFootstepSound,
+		double newx=0.0, double newy=0.0,
+		double newvx=0.0, double newvy=0.0,
+		double newax=0.0, double neway=0.0,
+		double newdamp=0.0):Particle(newRen, newA, 
+							newx, newy, newvx, newvy, newax, neway, newdamp){
+
+		//The above is constructing a Player object as a particle with some default params
+		
+		//the placement of these should be better thought out!
+		dest.w=64;
+		dest.h=64;
+
+		moving=false;
+		timeMoving=0;
+		walkSpeed = 50.0;
+
+		waves = newWaves;
+		footstepSound = newFootstepSound;
 	}
 
-	void createWave(Mix_Chunk *sound, int startingX, int startingY){
-		waves.push_back(new Wave(ren, media, startingX, startingY));
-		Mix_PlayChannel(-1,sound,0);
+	//Put some registered handlers down here
+
+	void walkRight(){
+		v = walkSpeed;
+		moving = true;
+		//setAnimation("media/walkRight.txt");
 	}
 
-	void updateWaves(double dt){
-		if(waves.size() > 0){
-			for(int i=0; i < waves.size(); i++){
-				waves[i]->update(dt);
-				if(waves[i]->getTimeAlive() > 4.0){
-					delete waves[i];
-					waves.erase(waves.begin()+i);
-				}else if(waves[i]->getTimeAlive() > 2.0)
-					waves[i]->setAnimation("media/sound3.txt");
-				else if(waves[i]->getTimeAlive() > 1.0)
-					waves[i]->setAnimation("media/sound2.txt");
-				
-			}
+	void walkLeft(){
+		v = -walkSpeed;
+		moving = true;
+	}
+
+	void stopMoving(){
+		vx=0;
+		timeMoving=0;
+	}
+
+	void update(double dt){
+		a->update(dt);
+
+		if(timeMoving > 1000){
+			timeMoving%=500;
+			waves->createWave(footstepSound, x+32, y+64);
 		}
+
+		if(moving)
+			timeMoving += (int)(dt*1000.0);
+
+		vx=v*cos(theta*PI/180); 
+		vy=v*sin(theta*PI/180);
+
+		vx+=ax*dt; vy+=ay*dt;
+		x+=vx*dt; y+=vy*dt;
+
+		dest.x=(int)x;
+		dest.y=(int)y;
+		
+		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
+
 };
 
 class MyGame:public Game {
@@ -53,10 +96,10 @@ class MyGame:public Game {
 	int totalTime;
 	int waveStartX;
 
-	Waves *wavs;
+	Waves *waves;
 
 	Animation playerWalkingRight, playerWalkingLeft;
-	Particle *player;
+	Player *player;
 
 	Mix_Chunk *sample;
 
@@ -64,42 +107,26 @@ class MyGame:public Game {
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		totalTime = 0.0;
 		waveStartX = 0;
-		wavs = new Waves(media, ren);
+		waves = new Waves(media, ren);
 
 		playerWalkingRight.read(media, "media/walkRight.txt");
 		playerWalkingLeft.read(media, "media/walkLeft.txt");
 
 		sample=media->readSound("media/footstep.wav");
 
-		player = new Particle(ren, &playerWalkingRight, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0, 64, 64);
+		//ren, &playerWalkingRight, &waves, sample, 0, (h/2)-64, 50, 0, 0.0, 0.0, 0.0
+		player = new Player(ren, &playerWalkingRight, waves, sample, 0, (480/2)-64, 0.0);
+
+		player->walkRight();
 	}
 
 	void update(double dt) {
 		SDL_RenderClear(ren);
 
-		if(totalTime > 1000){
-			waveStartX=64;
-			totalTime%=500;
-
-			wavs->createWave(sample, player->getX()+32, player->getY()+64);
-		}
-
-		if(player->getX() > (640-64)){
-			player->setVX(-(player->getVX()));
-			player->setAnimation(&playerWalkingLeft);
-		}else if(player->getX() < 0){
-			player->setVX(-(player->getVX()));
-			player->setAnimation(&playerWalkingRight);
-		}
-			
-
-
-		totalTime += (int)(dt*1000.0);
-
-		wavs->updateWaves(dt);
-
 		player->update(dt);
-		
+
+		waves->updateWaves(dt);
+		 
 		SDL_RenderPresent(ren);
 	}
 

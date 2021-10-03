@@ -24,7 +24,7 @@ class Wave{
 
 		setAnimation("media/sound1.txt");
 
-		for(int i=0; i < 180; i++) {
+		for(int i=0; i < 360; i++) {
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
             particles.push_back(new Particle(ren, &a, startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
@@ -48,5 +48,38 @@ class Wave{
 	~Wave(){
 		for (auto p:particles) 
 		  delete p;
+	}
+};
+
+class Waves{
+	SDL_Renderer *ren;
+	MediaManager *media;
+	vector <Wave *> waves;
+
+	public:
+	Waves(MediaManager *newMedia, SDL_Renderer *newRen){
+		media=newMedia;
+		ren=newRen;
+	}
+
+	void createWave(Mix_Chunk *sound, int startingX, int startingY){
+		waves.push_back(new Wave(ren, media, startingX, startingY));
+		Mix_PlayChannel(-1,sound,0);
+	}
+
+	void updateWaves(double dt){
+		if(waves.size() > 0){
+			for(int i=0; i < waves.size(); i++){
+				waves[i]->update(dt);
+				if(waves[i]->getTimeAlive() > 4.0){
+					delete waves[i];
+					waves.erase(waves.begin()+i);
+				}else if(waves[i]->getTimeAlive() > 2.0)
+					waves[i]->setAnimation("media/sound3.txt");
+				else if(waves[i]->getTimeAlive() > 1.0)
+					waves[i]->setAnimation("media/sound2.txt");
+				
+			}
+		}
 	}
 };
