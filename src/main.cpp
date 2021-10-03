@@ -20,6 +20,8 @@ class MyGame:public Game {
 	Waves *waves;
 	Player *player;
 
+	Mix_Chunk *backgroundMusic;
+
 	void initPlayer(){
 		//this list of actions could be setup in a config file
 		map<string,Animation *> playerAnimations;
@@ -46,7 +48,9 @@ class MyGame:public Game {
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		waves = new Waves(media, ren);
+		backgroundMusic = media->readSound("media/backgroundMusic.wav");
 		initPlayer();
+		Mix_PlayChannel(-1,backgroundMusic,-1);
 	}
 
 	void update(double dt) {

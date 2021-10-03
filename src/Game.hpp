@@ -59,6 +59,7 @@ class Game {
 	~Game(){
     	SDL_DestroyRenderer(ren);
     	SDL_DestroyWindow(window);
+		Mix_CloseAudio();
     	SDL_Quit();	
 	}
 };
