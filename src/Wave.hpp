@@ -17,7 +17,7 @@ class Wave{
 	double timeAlive;
 
 	public:
-	Wave(SDL_Renderer *newRen, MediaManager *newMedia, int startX, int startY){
+	Wave(SDL_Renderer *newRen, MediaManager *newMedia, int startX, int startY, double waveSpeed=100, double waveDamp=0.8){
 		ren = newRen;
 		media = newMedia;
 		timeAlive = 0.0;
@@ -25,7 +25,9 @@ class Wave{
 		setAnimation("media/sound1.txt");
 
 		for(int i=0; i < 180; i++) {
-            particles.push_back(new Particle(ren, &a, startX, startY, 100, i, 0.0, 0.0, 1.0));
+			//The accelerations for each sound particle are set at 0 on purpose
+			//Waves acceleration should not change!
+            particles.push_back(new Particle(ren, &a, startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
 		 	particles[i]->setBound(0,startY-100,0,startY);
         }
 	}
