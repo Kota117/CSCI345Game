@@ -18,16 +18,13 @@ using namespace std;
 
 class MyGame:public Game {
 	Waves *waves;
-
 	Player *player;
-
-	map<string,Animation *> playerAnimations;
-	map<string,Mix_Chunk *> playerSounds;
-
-	Mix_Chunk *sample;
 
 	void initPlayer(){
 		//this list of actions could be setup in a config file
+		map<string,Animation *> playerAnimations;
+		map<string,Mix_Chunk *> playerSounds;
+
 		playerAnimations["walkRight"] = new Animation();
 		playerAnimations["walkRight"]->read(media, "media/walkRight.txt");
 
