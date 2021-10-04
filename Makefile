@@ -9,8 +9,9 @@ MACCFLAGS=-I/opt/homebrew/include/SDL2 -D_THREAD_SAFE
 MACLIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_mixer
 
 WININCPATH=..\\SDL2-2.0.16\\x86_64-w64-mingw32
-WINFLAGS="-I$(WININCPATH)\\include\\SDL2"
-WINLIBS="-L$(WININCPATH)\\lib" -lmingw32 -lSDL2main -lSDL2
+WINMIXERPATH=..\\SDL2_mixer-2.0.4\x86_64-w64-mingw32
+WINFLAGS="-I$(WININCPATH)\\include\\SDL2" "-I$(WINMIXERPATH)\\include\\SDL2"
+WINLIBS="-L$(WININCPATH)\\lib" "-L$(WINMIXERPATH)\\lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer
 
 MACBIN=bin/unix_game
 LINBIN=bin/game
