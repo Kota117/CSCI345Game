@@ -22,7 +22,7 @@ class Wave{
 		media = newMedia;
 		timeAlive = 0.0;
 
-		setAnimation("media/sound1.txt");
+		setAnimation("sound1");
 
 		for(int i=0; i < 360; i++) {
 			//The accelerations for each sound particle are set at 0 on purpose
@@ -33,7 +33,7 @@ class Wave{
 	}
 
 	void setAnimation(string filePath){
-		a.read(media, filePath);
+		a.readAnimation(media, filePath);
 	}
 
 	void update(double dt){
@@ -75,10 +75,9 @@ class Waves{
 					delete waves[i];
 					waves.erase(waves.begin()+i);
 				}else if(waves[i]->getTimeAlive() > 2.0)
-					waves[i]->setAnimation("media/sound3.txt");
+					waves[i]->setAnimation("sound3");
 				else if(waves[i]->getTimeAlive() > 1.0)
-					waves[i]->setAnimation("media/sound2.txt");
-				
+					waves[i]->setAnimation("sound2");
 			}
 		}
 	}

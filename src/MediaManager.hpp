@@ -13,18 +13,21 @@ class MediaManager {
 	}
 
     Mix_Chunk *readSound(string filename) {
-	  if (samples.find(filename)==samples.end()) {
-		Mix_Chunk *sample;
-		sample=Mix_LoadWAV(filename.c_str());
-		if(!sample)  throw Exception ("Mix_LoadWAV: "+filename);
-	    samples[filename]=sample;
-	  }
-	  return samples[filename];
+		//Sound files are assumed to be in .wav format
+		//This logic can be modified to auto detect filetype in the future
+		filename = "media/sounds/" + filename + ".wav";
+		if (samples.find(filename)==samples.end()) {
+			Mix_Chunk *sample;
+			sample=Mix_LoadWAV(filename.c_str());
+			if(!sample) throw Exception ("Mix_LoadWAV: " + filename);
+				samples[filename]=sample;
+		}
+		return samples[filename];
 	}
 
 	SDL_Texture *readImage(string filename) {
 		SDL_Texture *tex;
-
+		filename = "media/images/" + filename + ".bmp";
 		if(images.find(filename)==images.end()) {
 			SDL_Surface *ob;
 			

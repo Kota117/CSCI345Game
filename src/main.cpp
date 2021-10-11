@@ -28,19 +28,19 @@ class MyGame:public Game {
 		map<string,Mix_Chunk *> playerSounds;
 
 		playerAnimations["walkRight"] = new Animation();
-		playerAnimations["walkRight"]->read(media, "media/walkRight.txt");
+		playerAnimations["walkRight"]->readAnimation(media, "walkRight");
 
 		playerAnimations["walkLeft"] = new Animation();
-		playerAnimations["walkLeft"]->read(media, "media/walkLeft.txt");
+		playerAnimations["walkLeft"]->readAnimation(media, "walkLeft");
 
 		playerAnimations["idle"] = new Animation();
-		playerAnimations["idle"]->read(media, "media/idle.txt");
+		playerAnimations["idle"]->readAnimation(media, "idle");
 
 		playerSounds["footstep"] = new Mix_Chunk();
-		playerSounds["footstep"]=media->readSound("media/footstep.wav");
+		playerSounds["footstep"]=media->readSound("footstep");
 
 		playerSounds["clap"] = new Mix_Chunk();
-		playerSounds["clap"]=media->readSound("media/clap.wav");
+		playerSounds["clap"]=media->readSound("clap");
 
 		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, playerSounds, 320, (480/2)-64);
 	}
@@ -48,7 +48,7 @@ class MyGame:public Game {
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
 		waves = new Waves(media, ren);
-		backgroundMusic = media->readSound("media/backgroundMusic.wav");
+		backgroundMusic = media->readSound("backgroundMusic");
 		initPlayer();
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 	}

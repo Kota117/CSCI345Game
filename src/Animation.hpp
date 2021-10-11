@@ -39,7 +39,8 @@ class Animation{
 	  currentTime=0;
 	}
 
-	void read(MediaManager *media,string newAnimationFile) {
+	void readAnimation(MediaManager *media,string newAnimationFile) {
+		newAnimationFile = "media/animations/" + newAnimationFile + ".txt";
 		if(newAnimationFile != animationFile){
 			animationFile = newAnimationFile;
 
@@ -47,10 +48,10 @@ class Animation{
 			ifstream in;
 
 			in.open(animationFile);
-
 			in >> max >> sheetName;
-			spriteSheet=media->readImage("media/"+sheetName+".bmp");
-			
+
+			spriteSheet=media->readImage(sheetName);
+
 			int millis,x,y,w,h;
 			for (int i=0;i<max;i++) {
 				in >> millis >> x >> y >> w >> h;
@@ -65,7 +66,6 @@ class Animation{
 
 	void update(double dt) {
 		currentTime+=(int)(dt*1000.0);
-		//cout << "Total Time " << totalTime << endl;
 		currentTime%=totalTime;
 	}
 
@@ -84,7 +84,6 @@ class Animation{
 	SDL_Texture *getTexture(){ return spriteSheet; }
 
 	~Animation() {
-		//cout << "Destroying Animation" << endl;
 		for (auto f:frames) 
 		  delete f;
 	}
