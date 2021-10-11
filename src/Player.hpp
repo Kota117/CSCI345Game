@@ -9,14 +9,16 @@
 using namespace std;
 
 class Player:public Particle{
-	double walkSpeed;
-
+	//These are lists of animations and sounds associated with the player
 	map<string,Animation *> playerAnimations;
 	map<string,Mix_Chunk *> playerSounds;
 
 	Waves *waves;
 
+	//This member is used to control wave creation timing
 	int timeMoving;
+	
+	double walkSpeed;
 
 	public:
 	Player(SDL_Renderer *newRen, map<string,Animation *> newPlayerAnimations, Animation* startingAnimation, Waves *newWaves,
@@ -44,9 +46,7 @@ class Player:public Particle{
 	void walkRight(){
 		v = walkSpeed;
 		theta = 0;
-
 		waves->createWave(playerSounds["footstep"], x+32, y+64);
-
 		setAnimation(playerAnimations["walkRight"]);
 	}
 
