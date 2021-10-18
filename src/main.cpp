@@ -47,7 +47,7 @@ class MyGame:public Game {
 
 	public:
 	MyGame(int w=640, int h=480):Game("Echos", w, h) {
-		waves = new Waves(media, ren);
+		waves = new Waves(ren);
 		backgroundMusic = media->readSound("backgroundMusic");
 		initPlayer();
 		Mix_PlayChannel(-1,backgroundMusic,-1);

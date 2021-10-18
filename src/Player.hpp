@@ -13,6 +13,11 @@ class Player:public Particle{
 	map<string,Animation *> playerAnimations;
 	map<string,Mix_Chunk *> playerSounds;
 
+	Animation *a;
+	SDL_Rect dest;
+
+	SDL_Renderer *ren;
+
 	Waves *waves;
 
 	//This member is used to control wave creation timing
@@ -26,14 +31,16 @@ class Player:public Particle{
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newRen, startingAnimation, 
-							newx, newy, newv, newtheta, newax, neway, newdamp){
+		double newdamp=0.0):Particle(newRen, newx, newy, newv, newtheta, newax, neway, newdamp){
 
 		//The above is constructing a Player object as a particle with some default params
 		
 		//the placement of these should be better thought out!
 		dest.w=64;
 		dest.h=64;
+
+		ren=newRen;
+		a=startingAnimation;
 
 		timeMoving=0;
 		walkSpeed = 50.0;
@@ -68,7 +75,7 @@ class Player:public Particle{
 	}
 
 	void update(double dt){
-		a->update(dt);
+		Particle::update(dt);
 
 		if(timeMoving >= 1000){
 			timeMoving%=500;
@@ -77,23 +84,21 @@ class Player:public Particle{
 			else
 				waves->createWave(playerSounds["footstep"], x+32, y+64);
 		}
-
+ 
 		if(v!=0)
 			timeMoving += (int)(dt*1000.0);
 
-		vx=v*cos(theta*PI/180); 
-		vy=v*sin(theta*PI/180);
-
-		vx+=ax*dt; vy+=ay*dt;
-		x+=vx*dt; y+=vy*dt;
-
-		dest.x=(int)x;
-		dest.y=(int)y;
 		
+		a->update(dt);
+		dest.x = x;
+		dest.y = y;
+
 		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
 
 	bool isMoving() { return v!=0; }
+
+	void setAnimation(Animation *newA){ a=newA; }
 
 	~Player(){
 		for(auto a:playerAnimations) delete a.second;
