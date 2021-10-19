@@ -11,39 +11,50 @@
 
 class Wave{
 	vector <Particle*> particles;
-	Animation a;
-	MediaManager *media;
+	
 	SDL_Renderer *ren;
-	double timeAlive;
+
+	double color;
+	int size;
+	double decayRate;
 
 	public:
-	Wave(SDL_Renderer *newRen, MediaManager *newMedia, int startX, int startY, double waveSpeed=100, double waveDamp=0.8){
+	Wave(SDL_Renderer *newRen, int startX, int startY, double waveSpeed=100, double waveDamp=0.8,
+		double startColor=255, double newDecayRate=100, int newSize=3){
+		
 		ren = newRen;
-		media = newMedia;
-		timeAlive = 0.0;
 
-		setAnimation("sound1");
+		color = startColor;
+		decayRate = newDecayRate;
+		size=newSize;
 
 		for(int i=0; i < 360; i++) {
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
-            particles.push_back(new Particle(ren, &a, startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
+            particles.push_back(new Particle(ren, startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
 		 	particles[i]->setBound(0,startY-100,0,480/2);
         }
 	}
 
-	void setAnimation(string filePath){
-		a.readAnimation(media, filePath);
+	void drawParticle(int x, int y){
+		for(int i=0; i<size; i++)
+			for(int j=0; j<size; j++)
+				SDL_RenderDrawPoint(ren, x+i, y+j);
 	}
 
 	void update(double dt){
+		color -= (dt*decayRate);
+		SDL_SetRenderDrawColor(ren, color, color, color, 255);
+
 		for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
+			drawParticle(particles[i]->getX(), particles[i]->getY());
         }
-		timeAlive += dt;
+
+		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
 	}
 
-	double getTimeAlive() { return timeAlive; }
+	double getColor() { return color; }
 
 	~Wave(){
 		for (auto p:particles) 
@@ -53,17 +64,18 @@ class Wave{
 
 class Waves{
 	SDL_Renderer *ren;
-	MediaManager *media;
 	vector <Wave *> waves;
 
 	public:
-	Waves(MediaManager *newMedia, SDL_Renderer *newRen){
-		media=newMedia;
+	Waves(SDL_Renderer *newRen){
 		ren=newRen;
 	}
 
-	void createWave(Mix_Chunk *sound, int startingX, int startingY){
-		waves.push_back(new Wave(ren, media, startingX, startingY));
+	void createWave(Mix_Chunk *sound, int startingX, int startingY, double waveSpeed=100, double waveDamp=0.8,
+		double startColor=255, double decayRate=100, int size=3){
+
+		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
+		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
 		Mix_PlayChannel(-1,sound,0);
 	}
 
@@ -71,14 +83,15 @@ class Waves{
 		if(waves.size() > 0){
 			for(int i=0; i < waves.size(); i++){
 				waves[i]->update(dt);
-				if(waves[i]->getTimeAlive() > 4.0){
+
+				//Once a wave has become invisible it is deleted
+				//This means we are not allowing fully invisible waves to be on screen at all
+				if(waves[i]->getColor() < 0.0){
 					delete waves[i];
 					waves.erase(waves.begin()+i);
-				}else if(waves[i]->getTimeAlive() > 2.0)
-					waves[i]->setAnimation("sound3");
-				else if(waves[i]->getTimeAlive() > 1.0)
-					waves[i]->setAnimation("sound2");
+				}
 			}
 		}
+		
 	}
 };

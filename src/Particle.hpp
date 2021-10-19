@@ -8,27 +8,19 @@ using namespace std;
 
 class Particle {
 	protected:
-	SDL_Renderer *ren;
-	Animation *a;
-	SDL_Rect dest;
 	double x, y, vx, vy, ax, ay, v, damp;
 	int minx, miny, maxx, maxy, theta;
 
+	SDL_Renderer *ren;
+
 	public:
-	Particle(SDL_Renderer *newRen, Animation *newA,
-			 double newx=0.0, double newy=0.0,
+	Particle(SDL_Renderer *newRen,
+		     double newx=0.0, double newy=0.0,
 			 double newv=0.0, int newtheta=0,
 			 double newax=0.0, double neway=0.0,
 			 double newdamp=1.0) {
 		
-		ren=newRen;
-		a=newA;
-		
-		dest.w = 8;
-		dest.h = 8;
-		
-		dest.x = newx;
-		dest.y = newy;
+		ren = newRen;
 		
 		v = newv; theta = newtheta;
 
@@ -49,9 +41,7 @@ class Particle {
 		maxx=newMaxX;
 		maxy=newMaxY;
 	}
-
-	void setAnimation(Animation *newA){ a=newA; }
-
+	
 	void setX(double newX) { x=newX; }
 	double getX() { return x; }
 	double getY() { return y; }
@@ -91,12 +81,5 @@ class Particle {
 
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
-
-		dest.x=(int)x;
-		dest.y=(int)y;
-
-		a->update(dt);
-		
-		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
 };
