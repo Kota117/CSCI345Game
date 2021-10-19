@@ -43,6 +43,10 @@ class Particle {
 		setBound();
 	}
 
+	SDL_Rect* getDest() {
+		return &dest;
+	}
+
 	void setBound(int newMinX=0, int newMinY=0, int newMaxX=0, int newMaxY=0) {
 		minx=newMinX;
 		miny=newMinY;
