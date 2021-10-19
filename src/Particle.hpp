@@ -87,31 +87,3 @@ class Particle {
 		x+=vx*dt; y+=vy*dt;
 	}
 };
-
-class SoundParticle:public Particle{
-	double particleColor;
-	int particleSize;
-	double decayRate;
-
-	public:
-	SoundParticle(SDL_Renderer *newRen, double newx=0.0, double newy=0.0,
-			 double newv=0.0, int newtheta=0,
-			 double newax=0.0, double neway=0.0,
-			 double newdamp=1.0):Particle(newRen, newx, newy, newv, newtheta, newax, neway, newdamp){
-				 particleColor = 255;
-				 particleSize = 3;
-				 decayRate = 300;
-	}
-	
-	void update(double dt){
-		Particle::update(dt);
-		particleColor -= (dt*decayRate);
-		SDL_SetRenderDrawColor(ren, particleColor, particleColor, particleColor, 255);
-		for(int i=0; i<particleSize; i++)
-			for(int j=0; j<particleSize; j++)
-				SDL_RenderDrawPoint(ren, x+i, y+j);
-		
-		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
-	}
-
-};
