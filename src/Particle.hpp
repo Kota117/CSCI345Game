@@ -11,16 +11,11 @@ class Particle {
 	double x, y, vx, vy, ax, ay, v, damp;
 	int minx, miny, maxx, maxy, theta;
 
-	SDL_Renderer *ren;
-
 	public:
-	Particle(SDL_Renderer *newRen,
-		     double newx=0.0, double newy=0.0,
+	Particle(double newx=0.0, double newy=0.0,
 			 double newv=0.0, int newtheta=0,
 			 double newax=0.0, double neway=0.0,
 			 double newdamp=1.0) {
-		
-		ren = newRen;
 		
 		v = newv; theta = newtheta;
 
@@ -33,10 +28,6 @@ class Particle {
 		
 		damp=newdamp;
 		setBound();
-	}
-
-	SDL_Rect* getDest() {
-		return &dest;
 	}
 
 	void setBound(int newMinX=0, int newMinY=0, int newMaxX=0, int newMaxY=0) {
