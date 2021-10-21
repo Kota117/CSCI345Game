@@ -43,7 +43,7 @@ class MyGame:public Game {
 		playerSounds["clap"] = new Mix_Chunk();
 		playerSounds["clap"]=media->readSound("clap");
 
-		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, playerSounds, 320, (480/2)-64);
+		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, playerSounds, 100, (480/2)-64);
 	}
 
 	void spawnEntity(int num=1, string type="") {
@@ -65,7 +65,7 @@ class MyGame:public Game {
 		sounds["clap"] = new Mix_Chunk();
 		sounds["clap"]=media->readSound("clap");
 
-		for (int i=0; i<num; i++) entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 420+i*20, (480/2)-64));
+		for (int i=0; i<num; i++) entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 300+i*50, (480/2)-64));
 	}
 
 	public:
@@ -84,10 +84,11 @@ class MyGame:public Game {
 			if (collision) {
 				cout << "Entity has died :c" << endl;
 				entities[i]->killed();
-				locations.push_back(i);
+				locations.push_back(i-locations.size());
 			}
 		}
-		for (auto i:locations) entities.erase(entities.begin()+i);
+		for (auto i:locations)
+			entities.erase(entities.begin()+i);
 		
 		SDL_RenderClear(ren);
 
