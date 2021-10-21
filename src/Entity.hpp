@@ -21,13 +21,17 @@ class Entity:public Particle{
   string entityType;
   bool moving, alive;
 
+  Animation *a;
+  SDL_Rect dest;
+  SDL_Renderer *ren;
+
   public:
-  Entity(SDL_Renderer *newRen, map<string,Animation *> newAnimations, Animation* startingAnimation, Waves *newWaves,map<string,Mix_Chunk *> newSounds, string newEntityType,
+  Entity(SDL_Renderer *newRen, map<string,Animation *> newAnimations, Animation* startingAnimation, Waves *newWaves,
+    map<string,Mix_Chunk *> newSounds, string newEntityType,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newRen, startingAnimation, 
-              newx, newy, newv, newtheta, newax, neway, newdamp) {
+		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp) {
     dest.w=64;
     dest.h=64;
 
@@ -41,7 +45,11 @@ class Entity:public Particle{
     sounds = newSounds;
     animations = newAnimations;
     entityType = newEntityType;
+
+    ren=newRen;
   }
+
+  void setAnimation(Animation *newA){ a=newA; }
 
   void moveRight() {
     v = speed;
@@ -108,25 +116,21 @@ class Entity:public Particle{
 
   void update(double dt) {
     if (alive) {
+      Particle::update(dt);
+
       ai(dt);
       a->update(dt);
 
       if(timeMoving >= 1000){
         timeMoving%=500;
         if(v<0)
-          waves->createWave(sounds["footstep"],x+dest.w/2+8,y+dest.h);
+          waves->createWave(sounds["footstep"],x+dest.w/2+8,y+dest.h, 100, 0.8, 100, 200);
         else
-          waves->createWave(sounds["footstep"],x+dest.w/2-8,y+dest.h);
+          waves->createWave(sounds["footstep"],x+dest.w/2-8,y+dest.h, 100, 0.8, 100, 200);
       }
     
       if(v!=0)
         timeMoving += (int)(dt*1000.0);
-
-      vx=v*cos(theta*PI/180); 
-      vy=v*sin(theta*PI/180);
-
-      vx+=ax*dt; vy+=ay*dt;
-      x+=vx*dt; y+=vy*dt;
 
       dest.x=(int)x;
       dest.y=(int)y;
@@ -135,6 +139,8 @@ class Entity:public Particle{
   }
 
   bool isMoving() { return v!=0; }
+
+  SDL_Rect *getDest(){return &dest;}
 
   ~Entity() {
     for(auto a:animations) delete a.second;

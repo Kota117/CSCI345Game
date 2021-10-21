@@ -31,7 +31,7 @@ class Player:public Particle{
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newRen, newx, newy, newv, newtheta, newax, neway, newdamp){
+		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp){
 
 		//The above is constructing a Player object as a particle with some default params
 		
@@ -99,6 +99,8 @@ class Player:public Particle{
 	bool isMoving() { return v!=0; }
 
 	void setAnimation(Animation *newA){ a=newA; }
+
+	SDL_Rect *getDest(){return &dest;}
 
 	~Player(){
 		for(auto a:playerAnimations) delete a.second;
