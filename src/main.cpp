@@ -51,19 +51,19 @@ class MyGame:public Game {
 		map<string,Mix_Chunk *> sounds;
 
 		animations["walkRight"] = new Animation();
-		animations["walkRight"]->readAnimation(media, "walkRight");
+		animations["walkRight"]->readAnimation(media, type+"walkRight");
 
 		animations["walkLeft"] = new Animation();
-		animations["walkLeft"]->readAnimation(media, "walkLeft");
+		animations["walkLeft"]->readAnimation(media, type+"walkLeft");
 
 		animations["idle"] = new Animation();
-		animations["idle"]->readAnimation(media, "idle");
+		animations["idle"]->readAnimation(media, type+"idle");
 
 		sounds["footstep"] = new Mix_Chunk();
-		sounds["footstep"]=media->readSound("footstep");
+		sounds["footstep"]=media->readSound(type+"footstep");
 
 		sounds["clap"] = new Mix_Chunk();
-		sounds["clap"]=media->readSound("clap");
+		sounds["clap"]=media->readSound(type+"clap");
 
 		for (int i=0; i<num; i++) entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 300+i*50, (480/2)-64));
 	}
@@ -78,25 +78,25 @@ class MyGame:public Game {
 	}
 
 	void update(double dt) {
-		vector<int> locations;
-		for (int i=0; i<entities.size(); i++) {
-			SDL_bool collision = SDL_HasIntersection(entities[i]->getDest(),player->getDest());
-			if (collision) {
-				cout << "Entity has died :c" << endl;
-				entities[i]->killed();
-				locations.push_back(i-locations.size());
-			}
-		}
-		for (auto i:locations)
-			entities.erase(entities.begin()+i);
-		
 		SDL_RenderClear(ren);
 
 		waves->updateWaves(dt);
 
 		player->update(dt);
 
-		for (auto e:entities) e->update(dt);
+		for (auto e:entities) e->update(dt, player->getX());
+
+		// vector<int> locations;
+		// for (int i=0; i<entities.size(); i++) {
+		// 	SDL_bool collision = SDL_HasIntersection(entities[i]->getDest(),player->getDest());
+		// 	if (collision) {
+		// 		cout << "Entity has died :c" << endl;
+		// 		entities[i]->killed();
+		// 		locations.push_back(i-locations.size());
+		// 	}
+		// }
+		// for (auto i:locations)
+		// 	entities.erase(entities.begin()+i);
 		 
 		SDL_RenderPresent(ren);
 	}
@@ -126,7 +126,7 @@ class MyGame:public Game {
 	~MyGame() {
 		delete player;
 		delete waves;
-		for (auto e:entities) delete e;
+		for (int i=0; i<entities.size(); i++) entities.erase(entities.begin());
 	}
 };
 

@@ -19,7 +19,7 @@ class Entity:public Particle{
   int timeMoving, movement, time;
   double speed;
   string entityType;
-  bool moving, alive;
+  bool moving;
 
   Animation *a;
   SDL_Rect dest;
@@ -38,7 +38,6 @@ class Entity:public Particle{
     timeMoving=0;
     speed=25.0;
     moving=0;
-    alive=1;
     time=0;
     
     waves = newWaves;
@@ -78,11 +77,6 @@ class Entity:public Particle{
   void killed() {
     // create new sound for entity death
     waves->createWave(sounds["clap"],x+dest.w/2,y+dest.h/2);
-    dest.x=0;
-    dest.y=0;
-    dest.w=0;
-    dest.h=0;
-    alive=0;
   }
 
   void move(direction dir, int ms, double dt) {
@@ -100,42 +94,50 @@ class Entity:public Particle{
     }
   }
 
-  void ai(double dt) {
-    if (!moving) {
-      movement = rand()%3;
-      if (movement==0) move(LEFT, 2000, dt);
-      else if (movement==1) move(RIGHT, 1000, dt);
-      else if (movement==2) move(STOP, 500, dt);
-    } else {
-      if (movement==0) move(LEFT, 2000, dt);
-      else if (movement==1) move(RIGHT, 1000, dt);
-      else if (movement==2) move(STOP, 1500, dt);
+  void ai(double dt, double playerX) {
+    int dist=100000;
+    int lastMove=movement;
+    if (x>playerX-.02 && x<playerX+0.2) {
+      movement=STOP;
     }
-    
+    else if (x < playerX) {
+      movement=RIGHT;
+    }
+    else {
+      movement=LEFT;
+    }
+    if (!moving || lastMove != movement) {
+      time=0;
+      if (movement==0) move(LEFT, dist, dt);
+      else if (movement==1) move(RIGHT, dist, dt);
+      else if (movement==2) move(STOP, dist, dt);
+    } else {
+      if (movement==0) move(LEFT, dist, dt);
+      else if (movement==1) move(RIGHT, dist, dt);
+      else if (movement==2) move(STOP, dist, dt);
+    }
   }
 
-  void update(double dt) {
-    if (alive) {
-      Particle::update(dt);
+  void update(double dt, double playerX) {
+    Particle::update(dt);
 
-      ai(dt);
-      a->update(dt);
+    ai(dt, playerX);
+    a->update(dt);
 
-      if(timeMoving >= 1000){
-        timeMoving%=500;
-        if(v<0)
-          waves->createWave(sounds["footstep"],x+dest.w/2+8,y+dest.h, 100, 0.8, 100, 200);
-        else
-          waves->createWave(sounds["footstep"],x+dest.w/2-8,y+dest.h, 100, 0.8, 100, 200);
-      }
-    
-      if(v!=0)
-        timeMoving += (int)(dt*1000.0);
-
-      dest.x=(int)x;
-      dest.y=(int)y;
-		  SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
+    if(timeMoving >= 1000){
+      timeMoving%=500;
+      if(v<0)
+        waves->createWave(sounds["footstep"],x+dest.w/2+8,y+dest.h, 100, 0.8, 100, 200);
+      else
+        waves->createWave(sounds["footstep"],x+dest.w/2-8,y+dest.h, 100, 0.8, 100, 200);
     }
+  
+    if(v!=0)
+      timeMoving += (int)(dt*1000.0);
+
+    dest.x=(int)x;
+    dest.y=(int)y;
+    SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 
   bool isMoving() { return v!=0; }
