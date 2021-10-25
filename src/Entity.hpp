@@ -75,8 +75,17 @@ class Entity:public Particle{
 	}
 
   void killed() {
-    // create new sound for entity death
     waves->createWave(sounds["clap"],x+dest.w/2,y+dest.h/2);
+  }
+
+  bool collide(SDL_Rect* pDest) {
+    SDL_bool collision = SDL_HasIntersection(&dest, pDest);
+    if (collision)  {
+      cout << "Entity has died :c" << endl;
+      killed();
+      return true;
+    }
+    return false;
   }
 
   void move(direction dir, int ms, double dt) {
@@ -95,17 +104,13 @@ class Entity:public Particle{
   }
 
   void ai(double dt, double playerX) {
-    int dist=100000;
+    int dist=INT_FAST32_MAX;
     int lastMove=movement;
-    if (x>playerX-.02 && x<playerX+0.2) {
-      movement=STOP;
-    }
-    else if (x < playerX) {
-      movement=RIGHT;
-    }
-    else {
-      movement=LEFT;
-    }
+
+    if (x>playerX-1 && x<playerX+1) movement=STOP;
+    else if (x < playerX) movement=RIGHT;
+    else movement=LEFT;
+
     if (!moving || lastMove != movement) {
       time=0;
       if (movement==0) move(LEFT, dist, dt);
@@ -120,8 +125,8 @@ class Entity:public Particle{
 
   void update(double dt, double playerX) {
     Particle::update(dt);
-
     ai(dt, playerX);
+
     a->update(dt);
 
     if(timeMoving >= 1000){
