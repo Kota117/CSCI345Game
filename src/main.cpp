@@ -23,6 +23,8 @@ class MyGame:public Game {
 
 	Mix_Chunk *backgroundMusic;
 
+	int w,h;
+
 	void initPlayer(){
 		//this list of actions could be setup in a config file
 		map<string,Animation *> playerAnimations;
@@ -68,8 +70,30 @@ class MyGame:public Game {
 		for (int i=0; i<num; i++) entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 300+i*50, (480/2)-64));
 	}
 
+	void drawStaticParticle(int x, int y, int size){
+		for(int i=0; i<size; i++)
+			for(int j=0; j<size; j++)
+				SDL_RenderDrawPoint(ren, x+i, y+j);
+	}
+
+	void drawStaticEffect(int width, int height, int size){
+		int color;
+
+		for(int i=0; i<(width); i+=size){
+			for(int j=0; j<(height); j+=size){
+				color = rand()%254 + 1;
+				SDL_SetRenderDrawColor(ren, color, color, color, 50);
+				drawStaticParticle(i, j, size);
+			}	
+		}
+		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
+	}
+
 	public:
-	MyGame(int w=640, int h=480):Game("Echos", w, h) {
+	MyGame(int newW=640, int newH=480):Game("Echos", newW, newH) {
+		w = newW;
+		h = newH;
+		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 		waves = new Waves(ren);
 		backgroundMusic = media->readSound("backgroundMusic");
 		initPlayer();
@@ -97,6 +121,8 @@ class MyGame:public Game {
 		player->update(dt);
 
 		for (auto e:entities) e->update(dt);
+
+		drawStaticEffect(w, h, 4);
 		 
 		SDL_RenderPresent(ren);
 	}
