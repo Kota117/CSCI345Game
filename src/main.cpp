@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include <math.h>
+#include <string>
+
 
 #include "Exception.hpp"
 #include "MediaManager.hpp"
@@ -13,38 +15,20 @@
 #include "Wave.hpp"
 #include "Player.hpp"
 #include "Entity.hpp"
+#include "Config.hpp"
 
 using namespace std;
 
+
+
 class MyGame:public Game {
 	Waves *waves;
+
+	
 	Player *player;
 	vector<Entity *>entities;
 
 	Mix_Chunk *backgroundMusic;
-
-	void initPlayer(){
-		//this list of actions could be setup in a config file
-		map<string,Animation *> playerAnimations;
-		map<string,Mix_Chunk *> playerSounds;
-
-		playerAnimations["walkRight"] = new Animation();
-		playerAnimations["walkRight"]->readAnimation(media, "walkRight");
-
-		playerAnimations["walkLeft"] = new Animation();
-		playerAnimations["walkLeft"]->readAnimation(media, "walkLeft");
-
-		playerAnimations["idle"] = new Animation();
-		playerAnimations["idle"]->readAnimation(media, "idle");
-
-		playerSounds["footstep"] = new Mix_Chunk();
-		playerSounds["footstep"]=media->readSound("footstep");
-
-		playerSounds["clap"] = new Mix_Chunk();
-		playerSounds["clap"]=media->readSound("clap");
-
-		player = new Player(ren, playerAnimations, playerAnimations["idle"], waves, playerSounds, 100, (480/2)-64);
-	}
 
 	void spawnEntity(int num=1, string type="") {
 		map<string,Animation *> animations;
@@ -71,10 +55,13 @@ class MyGame:public Game {
 	}
 
 	public:
-	MyGame(int w=640, int h=480):Game("Echos", w, h) {
+	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
 		waves = new Waves(ren);
-		backgroundMusic = media->readSound("backgroundMusic");
-		initPlayer();
+		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
+
+		Config playerConf("player");
+		player = new Player(media, ren, waves, playerConf, 100, (480/2)-64);
+
 		spawnEntity(5);
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 	}
@@ -132,7 +119,10 @@ class MyGame:public Game {
 
 int main(int argc, char* argv[]) {
     try {
-		MyGame g;
+		Config gameConf("game");
+
+		MyGame g(gameConf);
+
 		g.run();
 	} catch (Exception e) {
 		cerr << e;

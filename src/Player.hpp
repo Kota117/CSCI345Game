@@ -5,6 +5,7 @@
 #include "Particle.hpp"
 #include "Wave.hpp"
 #include "Animation.hpp"
+#include "Config.hpp"
 
 using namespace std;
 
@@ -17,6 +18,7 @@ class Player:public Particle{
 	SDL_Rect dest;
 
 	SDL_Renderer *ren;
+	MediaManager *media;
 
 	Waves *waves;
 
@@ -26,8 +28,8 @@ class Player:public Particle{
 	double walkSpeed;
 
 	public:
-	Player(SDL_Renderer *newRen, map<string,Animation *> newPlayerAnimations, Animation* startingAnimation, Waves *newWaves,
-		map<string,Mix_Chunk *> newPlayerSounds,
+	       //I am unsure about this media manager
+	Player(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config &playerConf,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
@@ -35,19 +37,31 @@ class Player:public Particle{
 
 		//The above is constructing a Player object as a particle with some default params
 		
-		//the placement of these should be better thought out!
-		dest.w=64;
-		dest.h=64;
-
 		ren=newRen;
-		a=startingAnimation;
-
-		timeMoving=0;
-		walkSpeed = 50.0;
-
 		waves = newWaves;
-		playerSounds = newPlayerSounds;
-		playerAnimations = newPlayerAnimations;
+		media=newMedia;
+		timeMoving=0;
+
+		dest.w=stoi(playerConf["width"]);
+		dest.h=stoi(playerConf["height"]);
+
+		walkSpeed = stod(playerConf["baseWalkSpeed"]);
+
+		vector<string> newAnimations = playerConf.getMany("animations");
+		for(auto anim: newAnimations){
+			playerAnimations[anim] = new Animation();
+			playerAnimations[anim]->readAnimation(media, anim);
+		}
+
+		a=playerAnimations[playerConf["defaultAnimation"]];
+		
+		vector<string> newPlayerSounds = playerConf.getMany("sounds");
+		for(auto sound: newPlayerSounds){
+			cout << "Animation" << sound << endl;
+			playerSounds[sound] = new Mix_Chunk();
+			playerSounds[sound] = media->readSound(sound);
+		}
+		
 	}
 
 	void walkRight(){
