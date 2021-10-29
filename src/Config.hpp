@@ -5,6 +5,8 @@
 #include <sstream>
 #include <map>
 
+using namespace std;
+
 class Config{
 	ifstream reader;
 

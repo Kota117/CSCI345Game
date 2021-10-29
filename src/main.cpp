@@ -6,7 +6,6 @@
 #include <math.h>
 #include <string>
 
-
 #include "Exception.hpp"
 #include "MediaManager.hpp"
 #include "Game.hpp"
@@ -19,39 +18,19 @@
 
 using namespace std;
 
-
-
 class MyGame:public Game {
 	Waves *waves;
 
-	
+	Config *playerConf;
 	Player *player;
+
+	map<string, Config *> entityConfs;
 	vector<Entity *>entities;
 
 	Mix_Chunk *backgroundMusic;
 
-	void spawnEntity(int num=1, string type="") {
-		map<string,Animation *> animations;
-		map<string,Mix_Chunk *> sounds;
-
-		for (int i=0; i<num; i++) {
-			animations["walkRight"] = new Animation();
-			animations["walkRight"]->readAnimation(media, type+"walkRight");
-
-			animations["walkLeft"] = new Animation();
-			animations["walkLeft"]->readAnimation(media, type+"walkLeft");
-
-			animations["idle"] = new Animation();
-			animations["idle"]->readAnimation(media, type+"idle");
-
-			sounds["footstep"] = new Mix_Chunk();
-			sounds["footstep"]=media->readSound(type+"footstep");
-
-			sounds["clap"] = new Mix_Chunk();
-			sounds["clap"]=media->readSound(type+"clap");
-
-			entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 300+i*50, (480/2)-64));
-		}
+	void spawnEntity(int x, int y, string type) {
+		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
 	}
 
 	public:
@@ -59,10 +38,14 @@ class MyGame:public Game {
 		waves = new Waves(ren);
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
-		Config playerConf("player");
+		playerConf = new Config("player");
 		player = new Player(media, ren, waves, playerConf, 100, (480/2)-64);
 
-		spawnEntity(5);
+		entityConfs["basic"] = (new Config("entity"));
+		
+		for(int i; i<5; i++)
+			spawnEntity(300+(i*50), (480/2)-64, "basic");
+
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 	}
 
@@ -99,10 +82,10 @@ class MyGame:public Game {
 	void handleKeyDown(SDL_Event keyEvent) {
 		if(!player->isMoving()){
 			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT) {
-				player->walkLeft();
+				player->moveLeft();
 			}
 			else if(keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT) {
-				player->walkRight();
+				player->moveRight();
 			}
 		}
 		
