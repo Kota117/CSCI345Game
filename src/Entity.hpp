@@ -39,22 +39,8 @@ class Entity:public Character{
     }
     return false;
   }
-
-  void move(direction dir, int ms, double dt) {
-    if (time == 0) {
-      if (dir==LEFT) moveLeft();
-      else if (dir==RIGHT) moveRight();
-      else if (dir==STOP) stopMoving();
-    }
-    time += (int)(1000*dt);
-    if (time > ms) {
-      stopMoving();
-      time=0;
-    }
-  }
-
+ 
   void ai(double dt, double playerX) {
-    int dist=INT_FAST32_MAX;
     int lastMove=movement;
 
     if (x>playerX-1 && x<playerX+1) movement=STOP;
@@ -62,14 +48,9 @@ class Entity:public Character{
     else movement=LEFT;
 
     if (!isMoving() || lastMove != movement) {
-      time=0;
-      if (movement==0) move(LEFT, dist, dt);
-      else if (movement==1) move(RIGHT, dist, dt);
-      else if (movement==2) move(STOP, dist, dt);
-    } else {
-      if (movement==0) move(LEFT, dist, dt);
-      else if (movement==1) move(RIGHT, dist, dt);
-      else if (movement==2) move(STOP, dist, dt);
+      if (movement==0) moveLeft();
+      else if (movement==1) moveRight();
+      else if (movement==2) stopMoving();
     }
   }
 
