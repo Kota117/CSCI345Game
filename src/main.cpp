@@ -29,6 +29,9 @@ class MyGame:public Game {
 
 	Mix_Chunk *backgroundMusic;
 
+	Animation *tvStatic;
+	SDL_Rect *staticDest;
+
 	void spawnEntity(int x, int y, string type) {
 		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
 	}
@@ -47,6 +50,20 @@ class MyGame:public Game {
 			spawnEntity(300+(i*50), (480/2)-64, "basic");
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
+
+		//This block is for initing the static effect
+		tvStatic = new Animation();
+		tvStatic->readAnimation(media, "static");
+		SDL_Texture *staticTexture = tvStatic->getTexture();
+		SDL_SetTextureAlphaMod(staticTexture, 100);
+
+		staticDest = new SDL_Rect();
+		staticDest->x = 0;
+		staticDest->x = 0;
+		staticDest->w = stoi(gameConf["screenW"]);
+		staticDest->h = stoi(gameConf["screenH"]);
+
+		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
 	void updateEntities(double dt) {
@@ -67,6 +84,9 @@ class MyGame:public Game {
 		player->update(dt);
 
 		updateEntities(dt);
+
+		tvStatic->update(dt);
+		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
 		 
 		SDL_RenderPresent(ren);
 	}
