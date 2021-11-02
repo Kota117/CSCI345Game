@@ -25,6 +25,9 @@ class MyGame:public Game {
 
 	int w,h;
 
+	Animation *tvStatic;
+	SDL_Rect *staticDest;
+
 	void initPlayer(){
 		//this list of actions could be setup in a config file
 		map<string,Animation *> playerAnimations;
@@ -70,30 +73,25 @@ class MyGame:public Game {
 		for (int i=0; i<num; i++) entities.push_back(new Entity(ren, animations, animations["idle"], waves, sounds, type, 300+i*50, (480/2)-64));
 	}
 
-	void drawStaticParticle(int x, int y, int size){
-		for(int i=0; i<size; i++)
-			for(int j=0; j<size; j++)
-				SDL_RenderDrawPoint(ren, x+i, y+j);
-	}
-
-	void drawStaticEffect(int width, int height, int size){
-		int color;
-
-		for(int i=0; i<(width); i+=size){
-			for(int j=0; j<(height); j+=size){
-				color = rand()%254 + 1;
-				SDL_SetRenderDrawColor(ren, color, color, color, 50);
-				drawStaticParticle(i, j, size);
-			}	
-		}
-		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
-	}
-
 	public:
 	MyGame(int newW=640, int newH=480):Game("Echos", newW, newH) {
 		w = newW;
 		h = newH;
+
+		//This block is for initing the static effect
+		tvStatic = new Animation();
+		tvStatic->readAnimation(media, "static");
+		SDL_Texture *staticTexture = tvStatic->getTexture();
+		SDL_SetTextureAlphaMod(staticTexture, 100);
+
+		staticDest = new SDL_Rect();
+		staticDest->x = 0;
+		staticDest->x = 0;
+		staticDest->w = w;
+		staticDest->h = h;
+
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+
 		waves = new Waves(ren);
 		backgroundMusic = media->readSound("backgroundMusic");
 		initPlayer();
@@ -122,7 +120,8 @@ class MyGame:public Game {
 
 		for (auto e:entities) e->update(dt);
 
-		drawStaticEffect(w, h, 4);
+		tvStatic->update(dt);
+		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
 		 
 		SDL_RenderPresent(ren);
 	}
