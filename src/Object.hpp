@@ -26,7 +26,7 @@ protected:
   Waves *waves;
 
 public:
-  Object(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg,
+  Object(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string objType,
   double newx=0.0, double newy=0.0,
   double newv=0.0, int newtheta=0,
   double newax=0.0, double neway=0.0,
@@ -53,6 +53,8 @@ public:
 			sounds[sound] = new Mix_Chunk();
 			sounds[sound] = media->readSound(sound);
     }
+
+    if (objType == "floor") y=480/2+1;
   }
 
   SDL_Rect *getDest() { return &dest; }
@@ -63,6 +65,7 @@ public:
     a->update(dt);
     dest.x = x;
     dest.y = y;
+
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 

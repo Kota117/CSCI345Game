@@ -55,8 +55,8 @@ class MyGame:public Game {
 			spawnEntity(300+(i*50), "basic");
 
 		objectConfs["floor"] = (new Config("floor"));
-		for (int i=0; i<640; i+=16) 
-			objects.push_back(new Object(media, ren, waves, objectConfs["floor"],i));
+		for (int i=0; i<640; i+=stoi((*objectConfs["floor"])["width"]))
+			objects.push_back(new Object(media, ren, waves, objectConfs["floor"], "floor", i));
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
@@ -96,8 +96,8 @@ class MyGame:public Game {
 
 		for (auto& o:objects) o->update(dt);
 
-		// tvStatic->update(dt);
-		// SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
+		tvStatic->update(dt);
+		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
 		 
 		SDL_RenderPresent(ren);
 	}
