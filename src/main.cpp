@@ -15,6 +15,8 @@
 #include "Player.hpp"
 #include "Entity.hpp"
 #include "Config.hpp"
+#include "Object.hpp"
+#include "Map.hpp"
 
 using namespace std;
 
@@ -27,13 +29,16 @@ class MyGame:public Game {
 	map<string, Config *> entityConfs;
 	vector<Entity *>entities;
 
+	map<string,Config *> objectConfs;
+	vector<Object *>objects;
+
 	Mix_Chunk *backgroundMusic;
 
 	Animation *tvStatic;
 	SDL_Rect *staticDest;
 
-	void spawnEntity(int x, int y, string type) {
-		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
+	void spawnEntity(int x, string type) {
+		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x));
 	}
 
 	public:
@@ -42,12 +47,16 @@ class MyGame:public Game {
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
 		playerConf = new Config("player");
-		player = new Player(media, ren, waves, playerConf, 100, (480/2)-64);
+		player = new Player(media, ren, waves, playerConf, 100);
 
 		entityConfs["basic"] = (new Config("entity"));
 		
-		for(int i; i<5; i++)
-			spawnEntity(300+(i*50), (480/2)-64, "basic");
+		for(int i=0; i<1; i++)
+			spawnEntity(300+(i*50), "basic");
+
+		objectConfs["floor"] = (new Config("floor"));
+		for (int i=0; i<640; i+=16) 
+			objects.push_back(new Object(media, ren, waves, objectConfs["floor"],i));
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
@@ -85,8 +94,10 @@ class MyGame:public Game {
 
 		updateEntities(dt);
 
-		tvStatic->update(dt);
-		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
+		for (auto& o:objects) o->update(dt);
+
+		// tvStatic->update(dt);
+		// SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
 		 
 		SDL_RenderPresent(ren);
 	}

@@ -39,14 +39,16 @@ class Character:public Particle{
 
 		ren=newRen;
 		media=newMedia;
-        cfg=newCfg;
-        waves=newWaves;
-        timeMoving=0;
+		cfg=newCfg;
+		waves=newWaves;
+		timeMoving=0;
 
 		dest.w = stoi((*cfg)["width"]);
 		dest.h = stoi((*cfg)["height"]);
 
-        baseSpeed = stod((*cfg)["baseSpeed"]);
+		y=480/2-dest.h;
+
+		baseSpeed = stod((*cfg)["baseSpeed"]);
 
 		vector<string> newAnimations = cfg->getMany("animations");
 		for(auto anim: newAnimations){
@@ -74,14 +76,14 @@ class Character:public Particle{
 	void moveRight(){
 		v = baseSpeed;
 		theta = 0;
-		waves->createWave(sounds["footstep"], x+32, y+64);
+		waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
 		setAnimation(animations["walkRight"]);
 	}
 
 	void moveLeft(){
 		v = baseSpeed;
 		theta = 180;
-		waves->createWave(sounds["footstep"], x+16, y+64);
+		waves->createWave(sounds["footstep"], x+dest.w/4, y+dest.h);
 		setAnimation(animations["walkLeft"]);
 	}
 
@@ -91,7 +93,7 @@ class Character:public Particle{
 		setAnimation(animations[(*cfg)["defaultAnimation"]]);
 	}
 
-	void clap(){ waves->createWave(sounds["clap"], x+32, y+32); }
+	void clap(){ waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2); }
 
 	virtual void update(double dt){
 		Particle::update(dt);
@@ -99,9 +101,9 @@ class Character:public Particle{
 		if(timeMoving >= 1000){
 			timeMoving%=500;
 			if(v<0)
-				waves->createWave(sounds["footstep"], x, y+64);
+				waves->createWave(sounds["footstep"], x, y+dest.h);
 			else
-				waves->createWave(sounds["footstep"], x+32, y+64);
+				waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
 		}
  
 		if(v!=0)

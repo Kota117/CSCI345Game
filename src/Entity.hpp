@@ -33,7 +33,6 @@ class Entity:public Character{
   bool collide(SDL_Rect* pDest) {
     SDL_bool collision = SDL_HasIntersection(&dest, pDest);
     if (collision)  {
-      cout << "Entity has died :c" << endl;
       killed();
       return true;
     }

@@ -1,6 +1,6 @@
 SRC=src
 MAINSRC=$(SRC)/main.cpp
-HEADERS= $(SRC)/Exception.hpp $(SRC)/Game.hpp $(SRC)/MediaManager.hpp $(SRC)/Particle.hpp $(SRC)/Animation.hpp $(SRC)/Wave.hpp $(SRC)/Player.hpp $(SRC)/Entity.hpp $(SRC)/Config.hpp $(SRC)/Character.hpp
+HEADERS= $(SRC)/Exception.hpp $(SRC)/Game.hpp $(SRC)/MediaManager.hpp $(SRC)/Particle.hpp $(SRC)/Animation.hpp $(SRC)/Wave.hpp $(SRC)/Player.hpp $(SRC)/Entity.hpp $(SRC)/Config.hpp $(SRC)/Character.hpp $(SRC)/Object.hpp $(SRC)/Map.hpp
 
 LINUXFLAGS=-I/usr/include/SDL2 -D_REENTRANT
 LINUXLIBS=-lSDL2 -lSDL2_mixer

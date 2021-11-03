@@ -19,8 +19,6 @@ class Object:public Particle{
 
   map<string,Animation *> animations;
   map<string, Mix_Chunk *> sounds;
-
-  double baseSpeed;
   
 protected:
   Animation *a;
@@ -62,6 +60,9 @@ public:
   void setAnimation(Animation *newA) { a=newA; }
 
   void update(double dt) {
+    a->update(dt);
+    dest.x = x;
+    dest.y = y;
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 
