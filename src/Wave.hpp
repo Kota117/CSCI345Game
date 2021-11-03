@@ -79,6 +79,10 @@ class Waves{
 		Mix_PlayChannel(-1,sound,0);
 	}
 
+	void deleteWaves() {
+		while (waves.size()>0) waves.erase(waves.begin());
+	}
+
 	void updateWaves(double dt){
 		if(waves.size() > 0){
 			for(int i=0; i < waves.size(); i++){

@@ -54,7 +54,10 @@ public:
 			sounds[sound] = media->readSound(sound);
     }
 
-    if (objType == "floor") y=480/2+1;
+    y = newy-dest.w;
+    if (objType == "floor") {
+      y = newy+1;
+    }
   }
 
   SDL_Rect *getDest() { return &dest; }

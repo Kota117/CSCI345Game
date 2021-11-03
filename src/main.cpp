@@ -26,37 +26,26 @@ class MyGame:public Game {
 	Config *playerConf;
 	Player *player;
 
-	map<string, Config *> entityConfs;
-	vector<Entity *>entities;
-
-	map<string,Config *> objectConfs;
-	vector<Object *>objects;
+	Map *level;
+	int currentLevel;
 
 	Mix_Chunk *backgroundMusic;
 
 	Animation *tvStatic;
 	SDL_Rect *staticDest;
 
-	void spawnEntity(int x, string type) {
-		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x));
-	}
-
 	public:
 	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
 		waves = new Waves(ren);
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
+		currentLevel=1;
+
+		level = new Map(media, ren, NULL);
+		level->initMap(currentLevel);
+
 		playerConf = new Config("player");
-		player = new Player(media, ren, waves, playerConf, 100);
-
-		entityConfs["basic"] = (new Config("entity"));
-		
-		for(int i=0; i<1; i++)
-			spawnEntity(300+(i*50), "basic");
-
-		objectConfs["floor"] = (new Config("floor"));
-		for (int i=0; i<640; i+=stoi((*objectConfs["floor"])["width"]))
-			objects.push_back(new Object(media, ren, waves, objectConfs["floor"], "floor", i));
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
@@ -75,14 +64,14 @@ class MyGame:public Game {
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void updateEntities(double dt) {
-		for (auto& e:entities) e->update(dt, player->getX());
+	void levelChange(int levelNum) {
+		currentLevel = levelNum;
+		waves->deleteWaves();
 
-		vector<int> locations;
-		for (int i=0; i<entities.size(); i++) {
-			if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
-		}
-		for (auto i:locations) entities.erase(entities.begin()+i);
+		level = new Map(media, ren, NULL);
+		level->initMap(currentLevel);
+
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
 	}
 
 	void update(double dt) {
@@ -92,9 +81,7 @@ class MyGame:public Game {
 
 		player->update(dt);
 
-		updateEntities(dt);
-
-		for (auto& o:objects) o->update(dt);
+		level->update(dt, player);
 
 		tvStatic->update(dt);
 		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
@@ -122,17 +109,20 @@ class MyGame:public Game {
 		
 		if(keyEvent.key.keysym.sym==SDLK_e)
 			player->clap();
+		else if(keyEvent.key.keysym.sym==SDLK_1)
+			levelChange(1);
+		else if(keyEvent.key.keysym.sym==SDLK_2)
+			levelChange(2);
 	}
 
 	~MyGame() {
 		delete player;
-		delete waves;
-		for (int i=0; i<entities.size(); i++) entities.erase(entities.begin());
+		delete waves;	
 	}
 };
 
 int main(int argc, char* argv[]) {
-    try {
+	try {
 		Config gameConf("game");
 
 		MyGame g(gameConf);

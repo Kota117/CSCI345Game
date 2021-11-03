@@ -46,7 +46,7 @@ class Character:public Particle{
 		dest.w = stoi((*cfg)["width"]);
 		dest.h = stoi((*cfg)["height"]);
 
-		y=480/2-dest.h;
+		y=newy-dest.h;
 
 		baseSpeed = stod((*cfg)["baseSpeed"]);
 
