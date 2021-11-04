@@ -39,14 +39,15 @@ class Map {
 
     entityConfs["basic"] = (new Config("entity"));
     entityConfs["big"] = (new Config("bigEntity"));
-    objectConfs["floor"] = (new Config("floor"));
+    
+    objectConfs["objects"] = (new Config("objects"));
   }
 
   int getStartX() { return startX; }
   int getStartY() { return startY; }
 
-  void placeFloor(int x, int y, string type) {
-    objects.push_back(new Object(media, ren, waves, objectConfs[type], type, x, y));
+  void placeObject(int x, int y, string type) {
+    objects.push_back(new Object(media, ren, waves, objectConfs["objects"], type, x, y));
   }
 
   void spawnEntity(int x, int y, string type) {
@@ -57,8 +58,11 @@ class Map {
     if (x==1) {
       startX=100;
       startY=480/2;
-      for (int i=0; i<640; i+=stoi((*objectConfs["floor"])["width"]))
-        placeFloor(i,startY,"floor");
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY,"floor");
+      
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY-128,"ceiling");
         
       for(int i=0; i<5; i++)
         spawnEntity(300+(i*50), startY, "basic");
@@ -67,11 +71,29 @@ class Map {
       startX=560;
       startY=480/2;
       
-      for (int i=0; i<640; i+=stoi((*objectConfs["floor"])["width"]))
-        placeFloor(i,startY,"floor");
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY,"floor");
+
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY-256,"ceiling");
         
       for(int i=0; i<5; i++)
         spawnEntity(100+(i*50), startY, "big");
+    }
+    else if (x==3) {
+      startX=640/2;
+      startY=480/2;
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY,"floor");
+      
+      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+        placeObject(i,startY-128,"ceiling");
+        
+      for (int i=startY; i>startY-128; i-=stoi((*objectConfs["objects"])["width"]))
+        placeObject(640-200,i,"lWall");
+
+      for (int i=startY; i>startY-128; i-=stoi((*objectConfs["objects"])["width"]))
+        placeObject(200,i,"rWall");
     }
   }
 
@@ -85,10 +107,21 @@ class Map {
     for (auto i:locations) entities.erase(entities.begin()+i);
   }
 
+  void onWall(Player *player) {
+    for (auto o:objects) {
+      if (o->collide(player->getDest()) && (o->getType() == "lWall" || o->getType() == "rWall")) {
+        player->stopMoving();
+        if (o->getType() == "lWall") player->setX(player->getX()-1);
+        else if (o->getType() == "rWall") player->setX(player->getX()+1);
+      }
+    }
+  }
+
   void update(double dt, Player *player) {
     waves->updateWaves(dt);
 		updateEntities(dt, player);
 		for (auto o:objects) o->update(dt);
+    onWall(player);
   }
 
   ~Map() {

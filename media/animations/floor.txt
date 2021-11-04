@@ -1,2 +1,2 @@
-1 floor
+1 objects
 1000 0 0 16 16

@@ -19,6 +19,8 @@ class Object:public Particle{
 
   map<string,Animation *> animations;
   map<string, Mix_Chunk *> sounds;
+
+  string objType;
   
 protected:
   Animation *a;
@@ -26,7 +28,7 @@ protected:
   Waves *waves;
 
 public:
-  Object(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string objType,
+  Object(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string newType,
   double newx=0.0, double newy=0.0,
   double newv=0.0, int newtheta=0,
   double newax=0.0, double neway=0.0,
@@ -55,14 +57,32 @@ public:
     }
 
     y = newy-dest.w;
-    if (objType == "floor") {
-      y = newy+1;
-    }
+    
+    objType = newType;
+
+    if (objType == "floor") setFloor();
+    else if (objType == "ceiling") setCeiling();
+    else if (objType == "lWall") setLWall();
+    else if (objType == "rWall") setRWall();
   }
 
   SDL_Rect *getDest() { return &dest; }
+  string getType() { return objType; }
 
   void setAnimation(Animation *newA) { a=newA; }
+
+  void setFloor() { setAnimation(animations["floor"]); y+=dest.w+1; }
+  void setCeiling() { setAnimation(animations["ceiling"]); }
+  void setLWall() { setAnimation(animations["lWall"]); }
+  void setRWall() { setAnimation(animations["rWall"]); }
+
+  bool collide(SDL_Rect* pDest) {
+    SDL_bool collision = SDL_HasIntersection(&dest, pDest);
+    if (collision)  {
+      return true;
+    }
+    return false;
+  }
 
   void update(double dt) {
     a->update(dt);

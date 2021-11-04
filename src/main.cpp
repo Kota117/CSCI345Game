@@ -113,6 +113,8 @@ class MyGame:public Game {
 			levelChange(1);
 		else if(keyEvent.key.keysym.sym==SDLK_2)
 			levelChange(2);
+		else if(keyEvent.key.keysym.sym==SDLK_3)
+			levelChange(3);
 	}
 
 	~MyGame() {
