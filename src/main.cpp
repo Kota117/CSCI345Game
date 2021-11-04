@@ -15,7 +15,7 @@
 #include "Player.hpp"
 #include "Entity.hpp"
 #include "Config.hpp"
-#include "Object.hpp"
+#include "Tile.hpp"
 #include "Map.hpp"
 
 using namespace std;

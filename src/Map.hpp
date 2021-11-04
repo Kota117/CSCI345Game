@@ -11,7 +11,7 @@
 #include "Wave.hpp"
 #include "Player.hpp"
 #include "Entity.hpp"
-#include "Object.hpp"
+#include "Tile.hpp"
 #include "Config.hpp"
 
 class Map {
@@ -24,8 +24,8 @@ class Map {
   map<string, Config *> entityConfs;
 	vector<Entity *>entities;
 
-	map<string,Config *> objectConfs;
-	vector<Object *>objects;
+	map<string,Config *> tileConfs;
+	vector<Tile *>tiles;
 
   int startX,startY;
 
@@ -40,14 +40,14 @@ class Map {
     entityConfs["basic"] = (new Config("entity"));
     entityConfs["big"] = (new Config("bigEntity"));
     
-    objectConfs["objects"] = (new Config("objects"));
+    tileConfs["tile"] = (new Config("tile"));
   }
 
   int getStartX() { return startX; }
   int getStartY() { return startY; }
 
   void placeObject(int x, int y, string type) {
-    objects.push_back(new Object(media, ren, waves, objectConfs["objects"], type, x, y));
+    tiles.push_back(new Tile(media, ren, waves, tileConfs["tile"], type, x, y));
   }
 
   void spawnEntity(int x, int y, string type) {
@@ -58,10 +58,10 @@ class Map {
     if (x==1) {
       startX=100;
       startY=480/2;
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY,"floor");
       
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY-128,"ceiling");
         
       for(int i=0; i<5; i++)
@@ -71,10 +71,10 @@ class Map {
       startX=560;
       startY=480/2;
       
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY,"floor");
 
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY-256,"ceiling");
         
       for(int i=0; i<5; i++)
@@ -83,16 +83,16 @@ class Map {
     else if (x==3) {
       startX=640/2;
       startY=480/2;
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY,"floor");
       
-      for (int i=0; i<640; i+=stoi((*objectConfs["objects"])["width"]))
+      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY-128,"ceiling");
         
-      for (int i=startY; i>startY-128; i-=stoi((*objectConfs["objects"])["width"]))
+      for (int i=startY; i>startY-128; i-=stoi((*tileConfs["tile"])["width"]))
         placeObject(640-200,i,"lWall");
 
-      for (int i=startY; i>startY-128; i-=stoi((*objectConfs["objects"])["width"]))
+      for (int i=startY; i>startY-128; i-=stoi((*tileConfs["tile"])["width"]))
         placeObject(200,i,"rWall");
     }
   }
@@ -108,11 +108,11 @@ class Map {
   }
 
   void onWall(Player *player) {
-    for (auto o:objects) {
-      if (o->collide(player->getDest()) && (o->getType() == "lWall" || o->getType() == "rWall")) {
+    for (auto t:tiles) {
+      if (t->collide(player->getDest()) && (t->getType() == "lWall" || t->getType() == "rWall")) {
         player->stopMoving();
-        if (o->getType() == "lWall") player->setX(player->getX()-1);
-        else if (o->getType() == "rWall") player->setX(player->getX()+1);
+        if (t->getType() == "lWall") player->setX(player->getX()-1);
+        else if (t->getType() == "rWall") player->setX(player->getX()+1);
       }
     }
   }
@@ -120,12 +120,12 @@ class Map {
   void update(double dt, Player *player) {
     waves->updateWaves(dt);
 		updateEntities(dt, player);
-		for (auto o:objects) o->update(dt);
+		for (auto t:tiles) t->update(dt);
     onWall(player);
   }
 
   ~Map() {
     while (entities.size()>0) entities.erase(entities.begin());
-    while (objects.size()>0) objects.erase(objects.begin());
+    while (tiles.size()>0) tiles.erase(tiles.begin());
   }
 };

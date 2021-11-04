@@ -12,7 +12,7 @@
 
 using namespace std;
 
-class Object:public Particle{
+class Tile:public Particle{
   Config *cfg;
   SDL_Renderer *ren;
   MediaManager *media;
@@ -20,7 +20,7 @@ class Object:public Particle{
   map<string,Animation *> animations;
   map<string, Mix_Chunk *> sounds;
 
-  string objType;
+  string tileType;
   
 protected:
   Animation *a;
@@ -28,7 +28,7 @@ protected:
   Waves *waves;
 
 public:
-  Object(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string newType,
+  Tile(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string newType,
   double newx=0.0, double newy=0.0,
   double newv=0.0, int newtheta=0,
   double newax=0.0, double neway=0.0,
@@ -58,16 +58,16 @@ public:
 
     y = newy-dest.w;
     
-    objType = newType;
+    tileType = newType;
 
-    if (objType == "floor") setFloor();
-    else if (objType == "ceiling") setCeiling();
-    else if (objType == "lWall") setLWall();
-    else if (objType == "rWall") setRWall();
+    if (tileType == "floor") setFloor();
+    else if (tileType == "ceiling") setCeiling();
+    else if (tileType == "lWall") setLWall();
+    else if (tileType == "rWall") setRWall();
   }
 
   SDL_Rect *getDest() { return &dest; }
-  string getType() { return objType; }
+  string getType() { return tileType; }
 
   void setAnimation(Animation *newA) { a=newA; }
 
@@ -92,7 +92,7 @@ public:
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 
-  ~Object() {
+  ~Tile() {
     for (auto a:animations) delete a.second;
     for (auto s:sounds) delete s.second;
   }
