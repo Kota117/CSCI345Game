@@ -16,7 +16,7 @@ class Particle {
 			 double newv=0.0, int newtheta=0,
 			 double newax=0.0, double neway=0.0,
 			 double newdamp=1.0) {
-		
+
 		v = newv; theta = newtheta;
 
 		x = newx; y = newy;
@@ -41,6 +41,23 @@ class Particle {
 	double getX() { return x; }
 	double getY() { return y; }
 
+	virtual SDL_Rect *getDest(){ 
+		SDL_Rect *returnVal = new SDL_Rect();
+		returnVal->x = x;
+		returnVal->y = y;
+		returnVal->w = 1;
+		returnVal->h = 1;
+		return returnVal;
+	}
+
+	void collide(Particle *newP) {
+		SDL_Rect *myBox = getDest();
+		if(SDL_HasIntersection(myBox, newP->getDest())){
+			theta = (theta+180)%360;
+		}
+		delete myBox;
+	}
+
 	virtual void update(double dt) {
 		if (maxx!=minx) {
 			if (x<=minx) { 
@@ -50,6 +67,13 @@ class Particle {
 					theta=180-theta;
 				theta%=360;
 				x=minx;
+
+				if (270<theta && theta<=360)
+					theta=540-theta;
+				else 
+					theta=180-theta;
+				theta%=360;
+				x=maxx;
 			}
 			if (x>=maxx) { 
 				if (270<theta && theta<=360)

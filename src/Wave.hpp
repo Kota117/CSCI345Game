@@ -36,6 +36,10 @@ class Wave{
         }
 	}
 
+	Particle *operator[] (int index) {
+		return particles[index];
+	}
+
 	void drawParticle(int x, int y){
 		for(int i=0; i<size; i++)
 			for(int j=0; j<size; j++)
@@ -48,6 +52,9 @@ class Wave{
 
 		for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
+		/*	for(unsigned i=0; i<; i++) {
+
+			} */
 			drawParticle(particles[i]->getX(), particles[i]->getY());
         }
 
@@ -71,6 +78,10 @@ class Waves{
 		ren=newRen;
 	}
 
+	Wave *operator[] (int index) {
+		return waves[index];
+	}
+
 	void createWave(Mix_Chunk *sound, int startingX, int startingY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double decayRate=100, int size=3){
 
@@ -80,7 +91,15 @@ class Waves{
 	}
 
 	void deleteWaves() {
-		while (waves.size()>0) waves.erase(waves.begin());
+		while (waves.size()>0){ waves.erase(waves.begin());}
+	}
+
+	void collideSound(Particle *newP){
+		for(auto w:waves){
+			for(int i=0; i<360; i++){
+				(*w)[i]->collide(newP);
+			}
+		}
 	}
 
 	void updateWaves(double dt){

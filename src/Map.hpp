@@ -27,15 +27,15 @@ class Map {
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
 
-  int startX,startY;
+  int startX,startY; 
 
   public:
-  Map(MediaManager *newMedia, SDL_Renderer *newRen, Config *newCfg) {
+  Map(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg) {
     media=newMedia;
     ren=newRen;
     cfg=newCfg;
 
-    waves=new Waves(ren);
+    waves=newWaves;
 
     entityConfs["basic"] = (new Config("entity"));
     entityConfs["big"] = (new Config("bigEntity"));
@@ -43,11 +43,15 @@ class Map {
     tileConfs["tile"] = (new Config("tile"));
   }
 
+  Tile *operator[] (int index) {
+    return tiles[index];
+  }
+
   int getStartX() { return startX; }
   int getStartY() { return startY; }
 
   void placeObject(int x, int y, string type) {
-    tiles.push_back(new Tile(media, ren, waves, tileConfs["tile"], type, x, y));
+    tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
   }
 
   void spawnEntity(int x, int y, string type) {
@@ -119,8 +123,12 @@ class Map {
 
   void update(double dt, Player *player) {
     waves->updateWaves(dt);
+    
 		updateEntities(dt, player);
-		for (auto t:tiles) t->update(dt);
+		for (auto t:tiles){
+      t->update(dt);
+      waves->collideSound(t);
+    }
     onWall(player);
   }
 

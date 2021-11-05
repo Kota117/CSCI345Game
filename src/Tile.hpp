@@ -28,7 +28,7 @@ protected:
   Waves *waves;
 
 public:
-  Tile(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg, string newType,
+  Tile(MediaManager *newMedia, SDL_Renderer *newRen, Config *newCfg, string newType,
   double newx=0.0, double newy=0.0,
   double newv=0.0, int newtheta=0,
   double newax=0.0, double neway=0.0,
@@ -37,7 +37,6 @@ public:
     ren=newRen;
     media=newMedia;
     cfg=newCfg;
-    waves=newWaves;
     
     dest.w = stoi((*cfg)["width"]);
     dest.h = stoi((*cfg)["height"]);
