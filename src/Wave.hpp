@@ -32,7 +32,7 @@ class Wave{
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
             particles.push_back(new Particle(startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
-		 	particles[i]->setBound(0,startY-100,0,480/2);
+		 	particles[i]->setBound(-100,-100,640+100,480+100);
         }
 	}
 
@@ -94,9 +94,9 @@ class Waves{
 		while (waves.size()>0){ waves.erase(waves.begin());}
 	}
 
-	void collideSound(Particle *newP){
+	void collideSound(Particle *newP) {
 		for(auto w:waves){
-			for(int i=0; i<360; i++){
+			for(int i=0; i<360; i++) {
 				(*w)[i]->collide(newP);
 			}
 		}

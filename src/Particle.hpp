@@ -49,11 +49,66 @@ class Particle {
 		returnVal->h = 1;
 		return returnVal;
 	}
+	
+	void swap(double &a, double &b) {
+		double temp;
+		temp = a;
+		a = b;
+		b = temp;
+	}
+
+	void sort(double r[]) {
+		for(int j=0; j<3; j++)
+			for(int i=0; i<3; i++)
+				if(r[i] > r[i+1])
+					swap(r[i], r[i+1]);
+	}
 
 	void collide(Particle *newP) {
 		SDL_Rect *myBox = getDest();
-		if(SDL_HasIntersection(myBox, newP->getDest())){
-			theta = (theta+180)%360;
+		SDL_Rect *otherBox = newP->getDest();
+
+		if(SDL_HasIntersection(myBox, otherBox)) {
+			double smallest, secondSmallest;
+
+			double r1 = sqrt(pow(otherBox->x-x,2)+pow(otherBox->y-y,2));
+			double r2 = sqrt(pow(otherBox->x+otherBox->w-x,2)+pow(otherBox->y-y,2));
+			double r3 = sqrt(pow(otherBox->x+otherBox->w-x,2)+pow(otherBox->y+otherBox->h-y,2));
+			double r4 = sqrt(pow(otherBox->x-x,2)+pow(otherBox->y+otherBox->h-y,2));
+
+			double r[4]={r1,r2,r3,r4};
+
+			sort(r);
+
+			smallest = r[0];
+			secondSmallest = r[1];
+
+			if ((smallest==r2 && secondSmallest==r3) || (smallest==r3 && secondSmallest==r2)) { 
+				if (180<=theta && theta<270)
+					theta=540-theta;
+				else 
+					theta=180-theta;
+				theta%=360;
+				x=otherBox->x+otherBox->w;
+			}
+			if ((smallest==r1 && secondSmallest==r4) || (smallest==r4 && secondSmallest==r1)) { 
+				if (270<theta && theta<=360)
+					theta=540-theta;
+				else 
+					theta=180-theta;
+				theta%=360;
+				x=otherBox->x;
+			}
+			if ((smallest==r3 && secondSmallest==r4) || (smallest==r4 && secondSmallest==r3)) {
+				theta=360-theta;
+				y=otherBox->y+otherBox->h;
+			}
+			if ((smallest==r1 && secondSmallest==r2) || (smallest==r2 && secondSmallest==r1)) { 
+				theta=360-theta;
+				y=otherBox->y-myBox->h;
+			}
+			vx=v*cos(theta*PI/180); 
+			vy=v*sin(theta*PI/180);
 		}
 		delete myBox;
 	}
@@ -67,13 +122,6 @@ class Particle {
 					theta=180-theta;
 				theta%=360;
 				x=minx;
-
-				if (270<theta && theta<=360)
-					theta=540-theta;
-				else 
-					theta=180-theta;
-				theta%=360;
-				x=maxx;
 			}
 			if (x>=maxx) { 
 				if (270<theta && theta<=360)
