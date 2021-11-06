@@ -110,6 +110,18 @@ class Map {
     }
     for (auto i:locations) entities.erase(entities.begin()+i);
   }
+  
+  void hitFloor(Player *player){
+    for (auto t:tiles) {
+      if (t->collide(player->getDest()) && (t->getType() == "floor")){
+        player->stopFalling();
+      }
+    }
+
+      
+
+
+  }
 
   void onWall(Player *player) {
     for (auto t:tiles) {
@@ -130,6 +142,7 @@ class Map {
       waves->collideSound(t);
     }
     onWall(player);
+    hitFloor(player);
   }
 
   ~Map() {

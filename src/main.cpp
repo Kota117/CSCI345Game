@@ -112,6 +112,10 @@ class MyGame:public Game {
 				player->jump();
 		}
 
+		if(player->isMoving()){ //for jumping while moving
+			if(keyEvent.key.keysym.sym==SDLK_SPACE)
+				player->jump();
+		}
 		
 		if(keyEvent.key.keysym.sym==SDLK_e)
 			player->clap();
@@ -121,6 +125,7 @@ class MyGame:public Game {
 			levelChange(2);
 		else if(keyEvent.key.keysym.sym==SDLK_3)
 			levelChange(3);
+
 	}
 
 	~MyGame() {
