@@ -32,8 +32,12 @@ class Wave{
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
             particles.push_back(new Particle(startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
-		 	particles[i]->setBound(0,startY-100,0,480/2);
+		 	particles[i]->setBound(-100,-100,640+100,480+100);
         }
+	}
+
+	Particle *operator[] (int index) {
+		return particles[index];
 	}
 
 	void drawParticle(int x, int y){
@@ -48,6 +52,9 @@ class Wave{
 
 		for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
+		/*	for(unsigned i=0; i<; i++) {
+
+			} */
 			drawParticle(particles[i]->getX(), particles[i]->getY());
         }
 
@@ -71,12 +78,28 @@ class Waves{
 		ren=newRen;
 	}
 
+	Wave *operator[] (int index) {
+		return waves[index];
+	}
+
 	void createWave(Mix_Chunk *sound, int startingX, int startingY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double decayRate=100, int size=3){
 
 		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
 		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
 		Mix_PlayChannel(-1,sound,0);
+	}
+
+	void deleteWaves() {
+		while (waves.size()>0){ waves.erase(waves.begin());}
+	}
+
+	void collideSound(Particle *newP) {
+		for(auto w:waves){
+			for(int i=0; i<360; i++) {
+				(*w)[i]->collide(newP);
+			}
+		}
 	}
 
 	void updateWaves(double dt){

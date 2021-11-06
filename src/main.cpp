@@ -15,6 +15,8 @@
 #include "Player.hpp"
 #include "Entity.hpp"
 #include "Config.hpp"
+#include "Tile.hpp"
+#include "Map.hpp"
 
 using namespace std;
 
@@ -24,39 +26,53 @@ class MyGame:public Game {
 	Config *playerConf;
 	Player *player;
 
-	map<string, Config *> entityConfs;
-	vector<Entity *>entities;
+	Map *level;
+	int currentLevel;
 
 	Mix_Chunk *backgroundMusic;
 
-	void spawnEntity(int x, int y, string type) {
-		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
-	}
+	Animation *tvStatic;
+	SDL_Rect *staticDest;
 
 	public:
 	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
-		waves = new Waves(ren);
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
-		playerConf = new Config("player");
-		player = new Player(media, ren, waves, playerConf, 100, (480/2)-64);
+		currentLevel=1;
 
-		entityConfs["basic"] = (new Config("entity"));
-		
-		for(int i; i<5; i++)
-			spawnEntity(300+(i*50), (480/2)-64, "basic");
+		waves = new Waves(ren);
+
+		level = new Map(media, ren, waves, NULL);
+		level->initMap(currentLevel);
+
+		playerConf = new Config("player");
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
+
+		//This block is for initing the static effect
+		tvStatic = new Animation();
+		tvStatic->readAnimation(media, "static");
+		SDL_Texture *staticTexture = tvStatic->getTexture();
+		SDL_SetTextureAlphaMod(staticTexture, 100);
+
+		staticDest = new SDL_Rect();
+		staticDest->x = 0;
+		staticDest->x = 0;
+		staticDest->w = stoi(gameConf["screenW"]);
+		staticDest->h = stoi(gameConf["screenH"]);
+
+		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void updateEntities(double dt) {
-		for (auto& e:entities) e->update(dt, player->getX());
+	void levelChange(int levelNum) {
+		currentLevel = levelNum;
+		waves->deleteWaves();
 
-		vector<int> locations;
-		for (int i=0; i<entities.size(); i++) {
-			if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
-		}
-		for (auto i:locations) entities.erase(entities.begin()+i);
+		level = new Map(media, ren, waves, NULL);
+		level->initMap(currentLevel);
+
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
 	}
 
 	void update(double dt) {
@@ -66,7 +82,10 @@ class MyGame:public Game {
 
 		player->update(dt);
 
-		updateEntities(dt);
+		level->update(dt, player);
+
+		tvStatic->update(dt);
+		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
 		 
 		SDL_RenderPresent(ren);
 	}
@@ -96,17 +115,22 @@ class MyGame:public Game {
 		
 		if(keyEvent.key.keysym.sym==SDLK_e)
 			player->clap();
+		else if(keyEvent.key.keysym.sym==SDLK_1)
+			levelChange(1);
+		else if(keyEvent.key.keysym.sym==SDLK_2)
+			levelChange(2);
+		else if(keyEvent.key.keysym.sym==SDLK_3)
+			levelChange(3);
 	}
 
 	~MyGame() {
 		delete player;
-		delete waves;
-		for (int i=0; i<entities.size(); i++) entities.erase(entities.begin());
+		delete waves;	
 	}
 };
 
 int main(int argc, char* argv[]) {
-    try {
+	try {
 		Config gameConf("game");
 
 		MyGame g(gameConf);
