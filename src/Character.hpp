@@ -43,8 +43,8 @@ class Character:public Particle{
 		waves=newWaves;
 		timeMoving=0;
 
-		dest.w = stoi((*cfg)["width"]);
-		dest.h = stoi((*cfg)["height"]);
+		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
+		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
 
 		y=newy-dest.h;
 
