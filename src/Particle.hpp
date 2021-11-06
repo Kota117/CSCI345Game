@@ -10,14 +10,16 @@ class Particle {
 	protected:
 	double x, y, vx, vy, ax, ay, v, damp;
 	int minx, miny, maxx, maxy, theta;
+	bool isCartesian;        
 
 	public:
 	Particle(double newx=0.0, double newy=0.0,
 			 double newv=0.0, int newtheta=0,
 			 double newax=0.0, double neway=0.0,
-			 double newdamp=1.0) {
+			 double newdamp=1.0, bool newIsCartesian=false) {
 		
 		v = newv; theta = newtheta;
+
 
 		x = newx; y = newy;
 
@@ -27,6 +29,7 @@ class Particle {
 		ax = newax; ay = neway; // px/s/s
 		
 		damp=newdamp;
+		isCartesian = newIsCartesian;
 		setBound();
 	}
 
@@ -40,6 +43,22 @@ class Particle {
 	void setX(double newX) { x=newX; }
 	double getX() { return x; }
 	double getY() { return y; }
+
+	void updatePolar(double dt){
+
+		vx=v*cos(theta*PI/180); 
+		vy=v*sin(theta*PI/180);
+
+		vx+=ax*dt; vy+=ay*dt;
+		x+=vx*dt; y+=vy*dt;
+
+	}
+
+	void updateCartesian(double dt){
+		vx+=ax*dt; vy+=ay*dt;
+		x+=vx*dt; y+=vy*dt;
+
+	}
 
 	virtual void update(double dt) {
 		if (maxx!=minx) {
@@ -71,10 +90,7 @@ class Particle {
 			}
       	}
 
-		vx=v*cos(theta*PI/180); 
-		vy=v*sin(theta*PI/180);
-
-		vx+=ax*dt; vy+=ay*dt;
-		x+=vx*dt; y+=vy*dt;
+		if (isCartesian) updateCartesian(dt);
+		else updatePolar(dt);
 	}
 };

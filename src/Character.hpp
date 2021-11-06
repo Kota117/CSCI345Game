@@ -35,7 +35,7 @@ class Character:public Particle{
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp){
+		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp, true){
 
 		ren=newRen;
 		media=newMedia;
@@ -65,46 +65,58 @@ class Character:public Particle{
 	}
 
 	//Basic Getters
-	bool isMoving() { return v!=0; }
+	bool isMoving() { return vx!=0 || vy != 0; }
 	SDL_Rect *getDest(){return &dest;}
 
 	//Basic Setters
 	void setAnimation(Animation *newA){ a=newA; }
 
 	void moveRight(){
-		v = baseSpeed;
-		theta = 0;
+		vx = baseSpeed;
+
+		
 		waves->createWave(sounds["footstep"], x+32, y+64);
 		setAnimation(animations["walkRight"]);
 	}
 
 	void moveLeft(){
-		v = baseSpeed;
-		theta = 180;
+		vx = -baseSpeed;
+		
 		waves->createWave(sounds["footstep"], x+16, y+64);
 		setAnimation(animations["walkLeft"]);
 	}
 
 	void stopMoving(){
-		v=0;
+		vx=0;
 		timeMoving=0;
 		setAnimation(animations[(*cfg)["defaultAnimation"]]);
 	}
 
 	void clap(){ waves->createWave(sounds["clap"], x+32, y+32); }
 
+	void jump(){
+
+		vy = -baseSpeed;
+		ay = 50;
+		
+		waves->createWave(sounds["footstep"], x+32, y+32);
+		
+		
+	}
+
+	
 	virtual void update(double dt){
 		Particle::update(dt);
 
 		if(timeMoving >= 1000){
 			timeMoving%=500;
-			if(v<0)
+			if(vx<0)
 				waves->createWave(sounds["footstep"], x, y+64);
 			else
 				waves->createWave(sounds["footstep"], x+32, y+64);
 		}
  
-		if(v!=0)
+		if(vx!=0)
 			timeMoving += (int)(dt*1000.0);
 
 		a->update(dt);
