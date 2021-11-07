@@ -139,7 +139,9 @@ class Character:public Particle{
 		a->update(dt);
 		dest.x = x;
 		dest.y = y;
+	}
 
+	virtual void render(){
 		SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
 	}
 

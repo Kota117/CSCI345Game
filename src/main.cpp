@@ -78,15 +78,17 @@ class MyGame:public Game {
 	}
 
 	void update(double dt) {
-		SDL_RenderClear(ren);
-
-		waves->updateWaves(dt);
-
 		level->update(dt, player);
 		player->update(dt);
 
 		tvStatic->update(dt);
+	}
+
+	void render(){
+		SDL_RenderClear(ren);
 		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
+
+		level->render(player);
 		  
 		SDL_RenderPresent(ren);
 	}

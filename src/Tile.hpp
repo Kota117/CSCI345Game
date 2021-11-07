@@ -87,7 +87,9 @@ public:
     a->update(dt);
     dest.x = x;
     dest.y = y;
+  }
 
+  void render(){
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 

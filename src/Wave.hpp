@@ -48,16 +48,18 @@ class Wave{
 
 	void update(double dt){
 		color -= (dt*decayRate);
-		SDL_SetRenderDrawColor(ren, color, color, color, 255);
-
+		
 		for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
-		/*	for(unsigned i=0; i<; i++) {
-
-			} */
-			drawParticle(particles[i]->getX(), particles[i]->getY());
+			
         }
+	}
 
+	void render(){
+		SDL_SetRenderDrawColor(ren, color, color, color, 255);
+		for(unsigned i=0; i<particles.size(); i++){
+			drawParticle(particles[i]->getX(), particles[i]->getY());
+		}
 		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
 	}
 
@@ -115,6 +117,11 @@ class Waves{
 				}
 			}
 		}
-		
+	}
+
+	void renderWaves(){
+		for(int i=0; i < waves.size(); i++){
+			waves[i]->render();
+		}
 	}
 };

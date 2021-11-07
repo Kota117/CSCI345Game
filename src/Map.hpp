@@ -165,6 +165,13 @@ class Map {
     onWall(player);
     hitFloor(player);
   }
+
+  void render(Player *player){
+    waves->renderWaves();
+    player->render();
+    for (auto t:tiles) t->render();
+    for (auto e:entities) e->render();
+  }
  
   ~Map() {
     while (entities.size()>0) entities.erase(entities.begin());
