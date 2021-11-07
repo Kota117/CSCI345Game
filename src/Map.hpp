@@ -27,12 +27,13 @@ class Map {
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
 
-
   int playerStartX, playerStartY;
   int tileWidth;
 
+  
+
   public:
-  Map(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg) {
+  Map(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *newCfg) {
     media=newMedia;
     ren=newRen;
     cfg=newCfg;
@@ -56,7 +57,7 @@ class Map {
   void placeTile(int x, int y, string type) {
     if(type=="player"){
       playerStartX=x;
-      playerStartY=y+(tileWidth*2);
+      playerStartY=y;
     }else if(type=="basic" || type=="big"){
       spawnEntity(x, y+tileWidth, type);
     }else if(type!="empty"){
@@ -72,8 +73,8 @@ class Map {
     ifstream inf("levels/"+levelName+".txt");
     string mapRow = "";
 
-    int placeX = tileWidth;
-    int placeY = tileWidth;
+    int placeX = 0;
+    int placeY = 0;
 
     string tileType = "";
 
@@ -164,9 +165,10 @@ class Map {
     onWall(player);
     hitFloor(player);
   }
-
+ 
   ~Map() {
     while (entities.size()>0) entities.erase(entities.begin());
     while (tiles.size()>0) tiles.erase(tiles.begin());
+    waves->deleteWaves();
   }
 };

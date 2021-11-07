@@ -27,7 +27,7 @@ class MyGame:public Game {
 	Player *player;
 
 	Map *level;
-	int currentLevel;
+	string currentLevel;
 
 	Mix_Chunk *backgroundMusic;
 
@@ -38,15 +38,14 @@ class MyGame:public Game {
 	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
-		currentLevel=1;
-
 		waves = new Waves(ren);
 
+		currentLevel="level1";
 		level = new Map(media, ren, waves, NULL);
-		level->initMap("level1");
+		level->initMap(currentLevel);
 
 		playerConf = new Config("player");
-		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY()+32);
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
@@ -66,12 +65,16 @@ class MyGame:public Game {
 	}
 
 	void levelChange(string levelName) {
-		waves->deleteWaves();
+		Map *oldLevel = level;
 
-		//delete level;
+		Map *newLevel = new Map(media, ren, waves, NULL);
+		newLevel->initMap(levelName);
+		level = newLevel;
+		player->setX(level->getStartX());
+		player->setY(level->getStartY()-32);
 
-		level = new Map(media, ren, waves, NULL);
-		level->initMap(levelName);
+		delete oldLevel;
+		currentLevel = levelName;
 	}
 
 	void update(double dt) {
@@ -84,7 +87,7 @@ class MyGame:public Game {
 
 		tvStatic->update(dt);
 		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
-		 
+		  
 		SDL_RenderPresent(ren);
 	}
 
@@ -116,8 +119,8 @@ class MyGame:public Game {
 			player->clap();
 		else if(keyEvent.key.keysym.sym==SDLK_1)
 			levelChange("level1");
-		// else if(keyEvent.key.keysym.sym==SDLK_2)
-		// 	levelChange(2);
+		else if(keyEvent.key.keysym.sym==SDLK_2)
+			levelChange("level2");
 		// else if(keyEvent.key.keysym.sym==SDLK_3)
 		// 	levelChange(3);
 
