@@ -43,7 +43,7 @@ class MyGame:public Game {
 		waves = new Waves(ren);
 
 		level = new Map(media, ren, waves, NULL);
-		level->initMap(currentLevel);
+		level->initMap("level1");
 
 		playerConf = new Config("player");
 		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
@@ -65,14 +65,13 @@ class MyGame:public Game {
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void levelChange(int levelNum) {
-		currentLevel = levelNum;
+	void levelChange(string levelName) {
 		waves->deleteWaves();
 
-		level = new Map(media, ren, waves, NULL);
-		level->initMap(currentLevel);
+		//delete level;
 
-		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
+		level = new Map(media, ren, waves, NULL);
+		level->initMap(levelName);
 	}
 
 	void update(double dt) {
@@ -80,9 +79,8 @@ class MyGame:public Game {
 
 		waves->updateWaves(dt);
 
-		player->update(dt);
-
 		level->update(dt, player);
+		player->update(dt);
 
 		tvStatic->update(dt);
 		SDL_RenderCopy(ren, tvStatic->getTexture(), tvStatic->getFrame(), staticDest);
@@ -96,9 +94,6 @@ class MyGame:public Game {
 			{
 				player->stopMoving();
 			}
-	
-			
-			
 	}
 
 	void handleKeyDown(SDL_Event keyEvent) {
@@ -120,11 +115,11 @@ class MyGame:public Game {
 		if(keyEvent.key.keysym.sym==SDLK_e)
 			player->clap();
 		else if(keyEvent.key.keysym.sym==SDLK_1)
-			levelChange(1);
-		else if(keyEvent.key.keysym.sym==SDLK_2)
-			levelChange(2);
-		else if(keyEvent.key.keysym.sym==SDLK_3)
-			levelChange(3);
+			levelChange("level1");
+		// else if(keyEvent.key.keysym.sym==SDLK_2)
+		// 	levelChange(2);
+		// else if(keyEvent.key.keysym.sym==SDLK_3)
+		// 	levelChange(3);
 
 	}
 

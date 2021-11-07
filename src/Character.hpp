@@ -22,13 +22,13 @@ class Character:public Particle{
 
 	double baseSpeed;
     int timeMoving;
+	bool inAir;
 
 	protected:
 	Animation *a;
 	SDL_Rect dest;
 
 	Waves *waves;
-
 
 	public:
 	Character(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg,
@@ -42,6 +42,7 @@ class Character:public Particle{
 		cfg=newCfg;
 		waves=newWaves;
 		timeMoving=0;
+		inAir = false;
 
 		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
 		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
@@ -76,7 +77,6 @@ class Character:public Particle{
 	void moveRight(){
 		vx = baseSpeed;
 
-		
 		waves->createWave(sounds["footstep"], x+32, y+64);
 		setAnimation(animations["walkRight"]);
 	}
@@ -95,35 +95,41 @@ class Character:public Particle{
 	}
 
 	void stopFalling(){
+		inAir=false;
 		vy=0;
 		ay=0;
 		timeMoving=0;
-		setAnimation(animations[(*cfg)["defaultAnimation"]]);
+		if(vx>0){
+			waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
+			setAnimation(animations["walkRight"]);
+		}else if(vx<0){
+			waves->createWave(sounds["footstep"], x, y+(dest.h-3));
+			setAnimation(animations["walkLeft"]);
+		}else{
+			waves->createWave(sounds["footstep"], x, y+(dest.h-3));
+			setAnimation(animations[(*cfg)["defaultAnimation"]]);
+		}
 	}
-
 
 	void clap(){ waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2); }
 
 	void jump(){
-
+		inAir = true;
 		vy = -baseSpeed;
 		ay = 50;
 		
 		waves->createWave(sounds["footstep"], x+32, y+32);
-		
-		
 	}
 
-	
 	virtual void update(double dt){
 		Particle::update(dt);
 
-		if(timeMoving >= 1000){
+		if(timeMoving >= 1000 && !inAir){
 			timeMoving%=500;
 			if(vx<0)
-				waves->createWave(sounds["footstep"], x, y+64);
+				waves->createWave(sounds["footstep"], x, y+(dest.h-3));
 			else
-				waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
+				waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
 		}
  
 		if(vx!=0)

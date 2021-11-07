@@ -32,7 +32,7 @@ class Wave{
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
             particles.push_back(new Particle(startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
-		 	particles[i]->setBound(-100,-100,640+100,480+100);
+		 	particles[i]->setBound();
         }
 	}
 

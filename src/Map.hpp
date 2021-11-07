@@ -27,7 +27,9 @@ class Map {
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
 
-  int startX,startY; 
+
+  int playerStartX, playerStartY;
+  int tileWidth;
 
   public:
   Map(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg) {
@@ -36,68 +38,85 @@ class Map {
     cfg=newCfg;
 
     waves=newWaves;
-
+		
     entityConfs["basic"] = (new Config("entity"));
     entityConfs["big"] = (new Config("bigEntity"));
     
     tileConfs["tile"] = (new Config("tile"));
+    tileWidth=stoi((*tileConfs["tile"])["width"]);
   }
 
   Tile *operator[] (int index) {
     return tiles[index];
-  }
+  } 
 
-  int getStartX() { return startX; }
-  int getStartY() { return startY; }
+  int getStartX() { return playerStartX; }
+  int getStartY() { return playerStartY; }
 
-  void placeObject(int x, int y, string type) {
-    tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
+  void placeTile(int x, int y, string type) {
+    if(type=="player"){
+      playerStartX=x;
+      playerStartY=y+(tileWidth*2);
+    }else if(type=="basic" || type=="big"){
+      spawnEntity(x, y+tileWidth, type);
+    }else if(type!="empty"){
+      tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
+    }
   }
 
   void spawnEntity(int x, int y, string type) {
 		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
 	}
 
-  void initMap(int x) {
-    if (x==1) {
-      startX=100;
-      startY=480/2;
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY,"floor");
-      
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY-128,"ceiling");
-        
-      for(int i=0; i<5; i++)
-        spawnEntity(300+(i*50), startY, "basic");
-    }
-    else if (x==2) {
-      startX=560;
-      startY=480/2;
-      
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY,"floor");
+  void initMap(string levelName) {
+    ifstream inf("levels/"+levelName+".txt");
+    string mapRow = "";
 
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY-256,"ceiling");
-        
-      for(int i=0; i<5; i++)
-        spawnEntity(100+(i*50), startY, "big");
-    }
-    else if (x==3) {
-      startX=640/2;
-      startY=480/2;
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY,"floor");
-      
-      for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
-        placeObject(i,startY-128,"ceiling");
-        
-      for (int i=startY; i>startY-128; i-=stoi((*tileConfs["tile"])["width"]))
-        placeObject(640-200,i,"lWall");
+    int placeX = tileWidth;
+    int placeY = tileWidth;
 
-      for (int i=startY; i>startY-128; i-=stoi((*tileConfs["tile"])["width"]))
-        placeObject(200,i,"rWall");
+    string tileType = "";
+
+    while(!inf.eof()){
+      getline(inf, mapRow);
+      for(char &c:mapRow){
+        switch(c){
+          case 'l': //left wall
+            tileType="lWall";
+            break;
+
+          case 'r': //right wall
+            tileType="rWall";
+            break;
+
+          case 'f': //floor
+            tileType="floor";
+            break;
+
+          case 'c': //ceiling
+            tileType="ceiling";
+            break;
+
+          case 'p': //player
+            tileType="player";
+            break;
+
+          case 'e': //enemy (basic)
+            tileType="basic";
+            break;
+
+          case 'b': //big enemy
+            tileType="big";
+            break;
+
+          default:
+            tileType="empty";
+        }
+        placeTile(placeX, placeY, tileType);
+        placeX+=tileWidth;
+      }
+      placeX=0;
+      placeY+=tileWidth;
     }
   }
 
@@ -108,6 +127,7 @@ class Map {
     for (int i=0; i<entities.size(); i++) {
       if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
     }
+
     for (auto i:locations) entities.erase(entities.begin()+i);
   }
   
@@ -115,12 +135,12 @@ class Map {
     for (auto t:tiles) {
       if (t->collide(player->getDest()) && (t->getType() == "floor")){
         player->stopFalling();
+        player->setY(player->getY()-1);
+      }else if (t->collide(player->getDest()) && (t->getType() == "ceiling")){
+        player->setVY(0);
+        player->setY(player->getY()+1);
       }
     }
-
-      
-
-
   }
 
   void onWall(Player *player) {

@@ -33,7 +33,7 @@ class Particle {
 		setBound();
 	}
 
-	void setBound(int newMinX=0, int newMinY=0, int newMaxX=0, int newMaxY=0) {
+	void setBound(int newMinX=-32, int newMinY=-32, int newMaxX=1312, int newMaxY=752) {
 		minx=newMinX;
 		miny=newMinY;
 		maxx=newMaxX;
@@ -42,7 +42,11 @@ class Particle {
 	
 	void setX(double newX) { x=newX; }
 	double getX() { return x; }
+
+	void setY(double newY) { y=newY; }
 	double getY() { return y; }
+
+	void setVY(double newVY) { vy=newVY; }
 
 	void updatePolar(double dt){
 
