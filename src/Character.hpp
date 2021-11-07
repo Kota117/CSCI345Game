@@ -94,6 +94,14 @@ class Character:public Particle{
 		setAnimation(animations[(*cfg)["defaultAnimation"]]);
 	}
 
+	void stopFalling(){
+		vy=0;
+		ay=0;
+		timeMoving=0;
+		setAnimation(animations[(*cfg)["defaultAnimation"]]);
+	}
+
+
 	void clap(){ waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2); }
 
 	void jump(){
