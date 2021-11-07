@@ -92,21 +92,26 @@ class MyGame:public Game {
 
 	void handleKeyUp(SDL_Event keyEvent) {
 		if (keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT ||
-			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT
-		){
-			player->stopMoving();
-		}
+			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT)
+			{
+				player->stopMoving();
+			}
+	
+			
+			
 	}
 
 	void handleKeyDown(SDL_Event keyEvent) {
 		if(!player->isMoving()){
-			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT) {
+			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT)
 				player->moveLeft();
-			}
-			else if(keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT) {
+			else if(keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT)
 				player->moveRight();
-			}
+
+			else if(keyEvent.key.keysym.sym==SDLK_SPACE)
+				player->jump();
 		}
+
 		
 		if(keyEvent.key.keysym.sym==SDLK_e)
 			player->clap();
