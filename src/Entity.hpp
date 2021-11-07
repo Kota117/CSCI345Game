@@ -17,7 +17,7 @@ class Entity:public Character{
   int movement, time;
 
   public:
-  Entity(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *entityConf,
+  Entity(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *entityConf,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,

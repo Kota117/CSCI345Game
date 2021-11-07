@@ -36,12 +36,13 @@ class MyGame:public Game {
 
 	public:
 	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
-		waves = new Waves(ren);
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
 		currentLevel=1;
 
-		level = new Map(media, ren, NULL);
+		waves = new Waves(ren);
+
+		level = new Map(media, ren, waves, NULL);
 		level->initMap(currentLevel);
 
 		playerConf = new Config("player");
@@ -68,7 +69,7 @@ class MyGame:public Game {
 		currentLevel = levelNum;
 		waves->deleteWaves();
 
-		level = new Map(media, ren, NULL);
+		level = new Map(media, ren, waves, NULL);
 		level->initMap(currentLevel);
 
 		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
