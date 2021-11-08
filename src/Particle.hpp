@@ -86,11 +86,12 @@ class Particle {
 					swap(r[i], r[i+1]);
 	}
 
-	void collide(Particle *newP) {
+	bool collide(Particle *newP) {
 		SDL_Rect *myBox = getDest();
 		SDL_Rect *otherBox = newP->getDest();
 
-		if(SDL_HasIntersection(myBox, otherBox)) {
+		bool hasCollision = SDL_HasIntersection(myBox, otherBox);
+		if(hasCollision) {
 			double smallest, secondSmallest;
 
 			double r1 = sqrt(pow(otherBox->x-x,2)+pow(otherBox->y-y,2));
@@ -133,6 +134,7 @@ class Particle {
 			vy=v*sin(theta*PI/180);
 		}
 		delete myBox;
+		return hasCollision;
 	}
 
 	virtual void update(double dt) {

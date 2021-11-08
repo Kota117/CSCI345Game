@@ -43,7 +43,7 @@ public:
 
     vector<string> newAnimations = cfg->getMany("animations");
 		for(auto anim: newAnimations){
-			animations[anim] = new Animation();
+			animations[anim] = new Animation(0);
 			animations[anim]->readAnimation(media, anim);
 		}
 
@@ -67,7 +67,8 @@ public:
 
   SDL_Rect *getDest() { return &dest; }
   string getType() { return tileType; }
-
+  
+  Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
   void setFloor() { setAnimation(animations["floor"]); y+=dest.w+1; }
@@ -78,12 +79,14 @@ public:
   bool collide(SDL_Rect* pDest) {
     SDL_bool collision = SDL_HasIntersection(&dest, pDest);
     if (collision)  {
+      a->setTransparency(255);
       return true;
     }
     return false;
   }
 
   void update(double dt) {
+    if(a->getTransparency() > 0) a->decTransparency(1);
     a->update(dt);
     dest.x = x;
     dest.y = y;

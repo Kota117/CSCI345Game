@@ -96,12 +96,16 @@ class Waves{
 		while (waves.size()>0){ waves.erase(waves.begin());}
 	}
 
-	void collideSound(Particle *newP) {
+	bool collideSound(Particle *newP) {
+		bool hasCollision = false;
 		for(auto w:waves){
 			for(int i=0; i<360; i++) {
-				(*w)[i]->collide(newP);
+				if((*w)[i]->collide(newP)){
+					hasCollision = true;
+				}
 			}
 		}
+		return hasCollision;
 	}
 
 	void updateWaves(double dt){

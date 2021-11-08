@@ -33,10 +33,24 @@ class Animation{
 	string sheetName;
 	string animationFile;
 
+	//controls all texture transparency
+	int transparency;
+
 	public:
-	Animation() { 
+	Animation(int newTransparency=255) { 
 	  totalTime=0;
 	  currentTime=0;
+	  transparency=newTransparency;
+	}
+
+	int getTransparency() { return transparency; }
+	void setTransparency(int newTransparency) { 
+		transparency=newTransparency;
+		SDL_SetTextureAlphaMod(spriteSheet, transparency);
+	}
+	void decTransparency(int decrement) { 
+		transparency-=decrement;
+		SDL_SetTextureAlphaMod(spriteSheet, transparency);
 	}
 
 	void readAnimation(MediaManager *media,string newAnimationFile) {
@@ -51,6 +65,7 @@ class Animation{
 			in >> max >> sheetName;
 
 			spriteSheet=media->readImage(sheetName);
+			SDL_SetTextureAlphaMod(spriteSheet, transparency);
 
 			int millis,x,y,w,h;
 			for (int i=0;i<max;i++) {

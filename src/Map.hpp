@@ -135,7 +135,8 @@ class Map {
   void hitFloor(Player *player){
     for (auto t:tiles) {
       if (t->collide(player->getDest()) && (t->getType() == "floor")){
-        player->stopFalling();
+        if(player->isInAir())
+          player->stopFalling();
         player->setY(player->getY()-1);
       }else if (t->collide(player->getDest()) && (t->getType() == "ceiling")){
         player->setVY(0);
@@ -155,12 +156,17 @@ class Map {
   }
 
   void update(double dt, Player *player) {
+    bool hasCollision = false;
     waves->updateWaves(dt);
     
 		updateEntities(dt, player);
 		for (auto t:tiles){
       t->update(dt);
-      waves->collideSound(t);
+      hasCollision = waves->collideSound(t);
+      if(hasCollision){
+        t->collide(t->getDest());
+        hasCollision=false;
+      }
     }
     onWall(player);
     hitFloor(player);

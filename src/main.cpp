@@ -50,10 +50,8 @@ class MyGame:public Game {
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
 		//This block is for initing the static effect
-		tvStatic = new Animation();
+		tvStatic = new Animation(100);
 		tvStatic->readAnimation(media, "static");
-		SDL_Texture *staticTexture = tvStatic->getTexture();
-		SDL_SetTextureAlphaMod(staticTexture, 100);
 
 		staticDest = new SDL_Rect();
 		staticDest->x = 0;

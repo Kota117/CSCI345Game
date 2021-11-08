@@ -70,6 +70,7 @@ class Character:public Particle{
 	//Basic Getters
 	bool isMoving() { return vx!=0 || vy != 0; }
 	SDL_Rect *getDest(){return &dest;}
+	bool isInAir() { return inAir;}
 
 	//Basic Setters
 	void setAnimation(Animation *newA){ a=newA; }
