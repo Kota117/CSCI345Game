@@ -95,6 +95,7 @@ class MyGame:public Game {
 		){
 			player->stopMoving();
 		}
+		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
 	}
 
 	void handleKeyDown(SDL_Event keyEvent) {

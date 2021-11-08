@@ -64,7 +64,7 @@ class Map {
       for (int i=0; i<640; i+=stoi((*tileConfs["tile"])["width"]))
         placeObject(i,startY-128,"ceiling");
         
-      for(int i=0; i<5; i++)
+      for(int i=0; i<1; i++)
         spawnEntity(300+(i*50), startY, "basic");
     }
     else if (x==2) {
@@ -100,20 +100,16 @@ class Map {
   void updateEntities(double dt, Player *player) {
     for (auto& e:entities) e->update(dt, player->getX());
 
-    vector<int> locations;
-    for (int i=0; i<entities.size(); i++) {
-      if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
-    }
-    for (auto i:locations) entities.erase(entities.begin()+i);
+    // vector<int> locations;
+    // for (int i=0; i<entities.size(); i++) {
+    //   if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
+    // }
+    // for (auto i:locations) entities.erase(entities.begin()+i);
   }
 
   void onWall(Player *player) {
-    for (auto t:tiles) {
-      if (t->collide(player->getDest()) && (t->getType() == "lWall" || t->getType() == "rWall")) {
-        player->stopMoving();
-        if (t->getType() == "lWall") player->setX(player->getX()-1);
-        else if (t->getType() == "rWall") player->setX(player->getX()+1);
-      }
+    for (auto &t:tiles) {
+      if (t->collide(player->getDest())) player->hitWall(t);
     }
   }
 
