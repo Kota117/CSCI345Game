@@ -9,8 +9,11 @@
 #include "MediaManager.hpp"
 #include "Config.hpp"
 #include "Wave.hpp"
+#include "Tile.hpp"
 
 using namespace std;
+
+enum direction{LEFT, RIGHT, STOP};
 
 class Character:public Particle{
 	Config *cfg;
@@ -23,6 +26,8 @@ class Character:public Particle{
 	double baseSpeed;
     int timeMoving;
 	bool inAir;
+	direction dir;
+	bool clapped;
 
 	protected:
 	Animation *a;
@@ -43,6 +48,8 @@ class Character:public Particle{
 		waves=newWaves;
 		timeMoving=0;
 		inAir = false;
+		dir=STOP;
+		clapped=false;
 
 		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
 		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
@@ -64,7 +71,6 @@ class Character:public Particle{
 			sounds[sound] = new Mix_Chunk();
 			sounds[sound] = media->readSound(sound);
 		}
-		
 	}
 
 	//Basic Getters
@@ -73,29 +79,39 @@ class Character:public Particle{
 	bool isInAir() { return inAir;}
 
 	//Basic Setters
+	void setClap(bool x) { clapped = x; }
 	void setAnimation(Animation *newA){ a=newA; }
 
 	void moveRight(){
-		vx = baseSpeed;
-
-		waves->createWave(sounds["footstep"], x+32, y+64);
-		setAnimation(animations["walkRight"]);
+		if (dir!=RIGHT) {
+			dir=RIGHT;
+			vx = baseSpeed;
+			theta = 0;
+			waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
+			setAnimation(animations["walkRight"]);
+		}
 	}
 
 	void moveLeft(){
-		vx = -baseSpeed;
-		
-		waves->createWave(sounds["footstep"], x+16, y+64);
-		setAnimation(animations["walkLeft"]);
+		if (dir!=LEFT) {
+			dir=LEFT;
+			vx = -baseSpeed;
+			theta = 180;
+			waves->createWave(sounds["footstep"], x+dest.w/4, y+dest.h);
+			setAnimation(animations["walkLeft"]);
+		}
 	}
 
 	void stopMoving(){
-		vx=0;
-		timeMoving=0;
-		setAnimation(animations[(*cfg)["defaultAnimation"]]);
+		if (dir!=STOP) {
+			dir=STOP;
+			vx=0;
+			timeMoving=0;
+			setAnimation(animations[(*cfg)["defaultAnimation"]]);
+		}
 	}
 
-	void stopFalling(){
+    void stopFalling(){
 		inAir=false;
 		vy=0;
 		ay=0;
@@ -112,7 +128,18 @@ class Character:public Particle{
 		}
 	}
 
-	void clap(){ waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2); }
+	void hitWall(Tile *t) {
+		vx=0;
+		if (t->getType() == "lWall") x-=1;
+		else if (t->getType() == "rWall") x+=1;
+	}
+
+	void clap(){
+		if (!clapped) {
+			waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2);
+			setClap(true);
+		}
+	}
 
 	void jump(){
 		inAir = true;
@@ -128,8 +155,8 @@ class Character:public Particle{
 
 		if(timeMoving >= 1000 && !inAir){
 			timeMoving%=500;
-			if(vx<0)
-				waves->createWave(sounds["footstep"], x, y+(dest.h-3));
+			if(dir==LEFT)
+				waves->createWave(sounds["footstep"], x, y+dest.h);
 			else
 				waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
 		}

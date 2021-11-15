@@ -146,12 +146,8 @@ class Map {
   }
 
   void onWall(Player *player) {
-    for (auto t:tiles) {
-      if (t->collide(player->getDest()) && (t->getType() == "lWall" || t->getType() == "rWall")) {
-        player->stopMoving();
-        if (t->getType() == "lWall") player->setX(player->getX()-1);
-        else if (t->getType() == "rWall") player->setX(player->getX()+1);
-      }
+    for (auto &t:tiles) {
+      if (t->collide(player->getDest())) player->hitWall(t);
     }
   }
 

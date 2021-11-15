@@ -93,10 +93,11 @@ class MyGame:public Game {
 
 	void handleKeyUp(SDL_Event keyEvent) {
 		if (keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT ||
-			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT)
-			{
-				player->stopMoving();
-			}
+			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT
+		){
+			player->stopMoving();
+		}
+		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
 	}
 
 	void handleKeyDown(SDL_Event keyEvent) {

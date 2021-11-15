@@ -8,13 +8,12 @@
 
 using namespace std;
 
-enum direction{LEFT, RIGHT, STOP};
-
 class Entity:public Character{
   map<string,Animation *> animations;
   map<string,Mix_Chunk *> sounds;
 
-  int movement, time;
+  direction currMove;
+  int time;
 
   public:
   Entity(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *entityConf,
@@ -23,6 +22,7 @@ class Entity:public Character{
 		double newax=0.0, double neway=0.0,
 		double newdamp=0.0):Character(newMedia, newRen, newWaves, entityConf, newx, newy, newv, newtheta, newax, neway, newdamp){
     
+    currMove=STOP;
     time=0;
   }
 
@@ -40,17 +40,9 @@ class Entity:public Character{
   }
  
   void ai(double dt, double playerX) {
-    int lastMove=movement;
-
-    if (x>playerX-1 && x<playerX+1) movement=STOP;
-    else if (x < playerX) movement=RIGHT;
-    else movement=LEFT;
-
-    if (!isMoving() || lastMove != movement) {
-      if (movement==0) moveLeft();
-      else if (movement==1) moveRight();
-      else if (movement==2) stopMoving();
-    }
+    if (x>playerX-1 && x<playerX+1) stopMoving();
+    else if (x < playerX) moveRight();
+    else moveLeft();
   }
 
   void update(double dt, double playerX) {
