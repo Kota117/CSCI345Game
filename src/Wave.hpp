@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <math.h>
+#include <mutex>
+#include <SDL_mutex.h>
 
 #include "Particle.hpp"
 #include "MediaManager.hpp"
@@ -76,10 +78,10 @@ class Waves{
 	SDL_Renderer *ren;
 	vector <Wave *> waves;
 	SDL_mutex *waveMutex;
-	waveMutex = SDL_CreateMutex();
 	public:
 	Waves(SDL_Renderer *newRen){
 		ren=newRen;
+		waveMutex= SDL_CreateMutex();
 	}
 
 	Wave *operator[] (int index) {
@@ -90,16 +92,16 @@ class Waves{
 		double startColor=255, double decayRate=100, int size=3){
 		
 		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
-		SDL_LockMutex(waveMutex);
+		//SDL_LockMutex(waveMutex);
 		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
-		SDL_UnlockMutex(waveMutex);
+		//SDL_UnlockMutex(waveMutex);
 		Mix_PlayChannel(-1,sound,0);
 	}
 
 	void deleteWaves() {
-		SDL_LockMutex(waveMutex);
+		//SDL_LockMutex(waveMutex);
 		while (waves.size()>0){ waves.erase(waves.begin());}
-		SDL_UnlockMutex(waveMutex);
+		//SDL_UnlockMutex(waveMutex);
 	}
 
 	bool collideSound(Particle *newP) {
