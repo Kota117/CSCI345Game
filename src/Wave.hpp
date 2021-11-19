@@ -18,6 +18,7 @@ class Wave{
 	int size;
 	double decayRate;
 
+
 	public:
 	Wave(SDL_Renderer *newRen, int startX, int startY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double newDecayRate=100, int newSize=3){
@@ -74,7 +75,8 @@ class Wave{
 class Waves{
 	SDL_Renderer *ren;
 	vector <Wave *> waves;
-
+	SDL_mutex *waveMutex;
+	waveMutex = SDL_CreateMutex();
 	public:
 	Waves(SDL_Renderer *newRen){
 		ren=newRen;
@@ -86,14 +88,18 @@ class Waves{
 
 	void createWave(Mix_Chunk *sound, int startingX, int startingY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double decayRate=100, int size=3){
-
+		
 		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
+		SDL_LockMutex(waveMutex);
 		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
+		SDL_UnlockMutex(waveMutex);
 		Mix_PlayChannel(-1,sound,0);
 	}
 
 	void deleteWaves() {
+		SDL_LockMutex(waveMutex);
 		while (waves.size()>0){ waves.erase(waves.begin());}
+		SDL_UnlockMutex(waveMutex);
 	}
 
 	bool collideSound(Particle *newP) {

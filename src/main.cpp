@@ -5,6 +5,8 @@
 #include <map>
 #include <math.h>
 #include <string>
+#include <SDL_mutex.h>
+
 
 #include "Exception.hpp"
 #include "MediaManager.hpp"
