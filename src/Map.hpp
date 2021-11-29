@@ -10,7 +10,7 @@
 #include "Animation.hpp"
 #include "Wave.hpp"
 #include "Player.hpp"
-#include "Entity.hpp"
+#include "NPC.hpp"
 #include "Tile.hpp"
 #include "Config.hpp"
 
@@ -21,8 +21,8 @@ class Map {
 
   Waves *waves;
 
-  map<string, Config *> entityConfs;
-	vector<Entity *>entities;
+  map<string, Config *>npcConfs;
+	vector<Npc *>npcs;
 
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
@@ -40,8 +40,8 @@ class Map {
 
     waves=newWaves;
 		
-    entityConfs["basic"] = (new Config("entity"));
-    entityConfs["big"] = (new Config("bigEntity"));
+    npcConfs["basic"] = (new Config("npc"));
+    npcConfs["big"] = (new Config("bigNpc"));
     
     tileConfs["tile"] = (new Config("tile"));
     tileWidth=stoi((*tileConfs["tile"])["width"]);
@@ -59,14 +59,14 @@ class Map {
       playerStartX=x;
       playerStartY=y;
     }else if(type=="basic" || type=="big"){
-      spawnEntity(x, y+tileWidth, type);
+      spawnNpc(x, y+tileWidth, type);
     }else if(type!="empty"){
       tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
     }
   }
 
-  void spawnEntity(int x, int y, string type) {
-		entities.push_back(new Entity(media, ren, waves, entityConfs[type], x, y));
+  void spawnNpc(int x, int y, string type) {
+		npcs.push_back(new Npc(media, ren, waves, npcConfs[type], x, y));
 	}
 
   void initMap(string levelName) {
@@ -121,15 +121,15 @@ class Map {
     }
   }
 
-  void updateEntities(double dt, Player *player) {
-    for (auto& e:entities) e->update(dt, player->getX());
+  void updateNpcs(double dt, Player *player) {
+    for (auto& e:npcs) e->update(dt, player->getX());
 
     vector<int> locations;
-    for (int i=0; i<entities.size(); i++) {
-      if (entities[i]->collide(player->getDest())) locations.push_back(i-locations.size());
+    for (int i=0; i<npcs.size(); i++) {
+      if (npcs[i]->collide(player->getDest())) locations.push_back(i-locations.size());
     }
 
-    for (auto i:locations) entities.erase(entities.begin()+i);
+    for (auto i:locations) npcs.erase(npcs.begin()+i);
   }
   
   void hitFloor(Player *player){
@@ -155,7 +155,7 @@ class Map {
     bool hasCollision = false;
     waves->updateWaves(dt);
     
-		updateEntities(dt, player);
+		updateNpcs(dt, player);
 		for (auto t:tiles){
       t->update(dt);
       hasCollision = waves->collideSound(t);
@@ -172,11 +172,11 @@ class Map {
     waves->renderWaves();
     player->render();
     for (auto t:tiles) t->render();
-    for (auto e:entities) e->render();
+    for (auto e:npcs) e->render();
   }
  
   ~Map() {
-    while (entities.size()>0) entities.erase(entities.begin());
+    while (npcs.size()>0) npcs.erase(npcs.begin());
     while (tiles.size()>0) tiles.erase(tiles.begin());
     waves->deleteWaves();
   }

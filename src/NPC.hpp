@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class Entity:public Character{
+class Npc:public Character{
   map<string,Animation *> animations;
   map<string,Mix_Chunk *> sounds;
 
@@ -16,11 +16,11 @@ class Entity:public Character{
   int time;
 
   public:
-  Entity(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *entityConf,
+  Npc(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *npcConf,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Character(newMedia, newRen, newWaves, entityConf, newx, newy, newv, newtheta, newax, neway, newdamp){
+		double newdamp=0.0):Character(newMedia, newRen, newWaves, npcConf, newx, newy, newv, newtheta, newax, neway, newdamp){
     
     currMove=STOP;
     time=0;
@@ -50,5 +50,5 @@ class Entity:public Character{
     Character::update(dt);
   }
 
-  ~Entity() {}
+  ~Npc() {}
 };

@@ -13,7 +13,7 @@
 #include "Animation.hpp"
 #include "Wave.hpp"
 #include "Player.hpp"
-#include "Entity.hpp"
+#include "NPC.hpp"
 #include "Config.hpp"
 #include "Tile.hpp"
 #include "Map.hpp"
