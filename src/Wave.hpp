@@ -21,12 +21,13 @@ class Wave{
 	double decayRate;
 
 
+
 	public:
 	Wave(SDL_Renderer *newRen, int startX, int startY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double newDecayRate=100, int newSize=3){
+
 		
 		ren = newRen;
-
 		color = startColor;
 		decayRate = newDecayRate;
 		size=newSize;
@@ -38,6 +39,7 @@ class Wave{
 		 	particles[i]->setBound();
         }
 	}
+	bool waveLock=0;
 
 	Particle *operator[] (int index) {
 		return particles[index];
@@ -78,6 +80,7 @@ class Waves{
 	SDL_Renderer *ren;
 	vector <Wave *> waves;
 	SDL_mutex *waveMutex;
+
 	public:
 	Waves(SDL_Renderer *newRen){
 		ren=newRen;
@@ -116,14 +119,24 @@ class Waves{
 		return hasCollision;
 	}
 
+	void lockWave(Wave *wave){
+		wave->waveLock=true;
+	}
+	void unlockWave(Wave *wave){
+		wave->waveLock=false;
+	}
+
 	void updateWaves(double dt){
 		if(waves.size() > 0){
 			for(int i=0; i < waves.size(); i++){
-				waves[i]->update(dt);
+				if(!waves[i]->waveLock){
+					waves[i]->update(dt);
+				}
 
 				//Once a wave has become invisible it is deleted
 				//This means we are not allowing fully invisible waves to be on screen at all
 				if(waves[i]->getColor() < 0.0){
+					lockWave(waves[i]);
 					delete waves[i];
 					waves.erase(waves.begin()+i);
 				}
