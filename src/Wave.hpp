@@ -95,9 +95,10 @@ class Waves{
 		double startColor=255, double decayRate=100, int size=3){
 		
 		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
-		//SDL_LockMutex(waveMutex);
-		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
-		//SDL_UnlockMutex(waveMutex);
+		if(SDL_LockMutex(waveMutex)==0){
+			waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
+			SDL_UnlockMutex(waveMutex);
+		}
 		Mix_PlayChannel(-1,sound,0);
 	}
 
@@ -109,12 +110,15 @@ class Waves{
 
 	bool collideSound(Particle *newP) {
 		bool hasCollision = false;
-		for(auto w:waves){
-			for(int i=0; i<360; i++) {
-				if((*w)[i]->collide(newP)){
-					hasCollision = true;
+		if(SDL_LockMutex(waveMutex)==0){
+			for(auto w:waves){
+				for(int i=0; i<360; i++) {
+					if((*w)[i]->collide(newP)){
+						hasCollision = true;
+					}
 				}
 			}
+			SDL_UnlockMutex(waveMutex);
 		}
 		return hasCollision;
 	}
@@ -127,26 +131,32 @@ class Waves{
 	}
 
 	void updateWaves(double dt){
-		if(waves.size() > 0){
-			for(int i=0; i < waves.size(); i++){
-				if(!waves[i]->waveLock){
-					waves[i]->update(dt);
-				}
+		if(SDL_LockMutex(waveMutex)==0){
+			if(waves.size() > 0){
+				for(int i=waves.size()-1; i >=0; i--){
+					if(!waves[i]->waveLock){
+						waves[i]->update(dt);
+					}
 
-				//Once a wave has become invisible it is deleted
-				//This means we are not allowing fully invisible waves to be on screen at all
-				if(waves[i]->getColor() < 0.0){
-					lockWave(waves[i]);
-					delete waves[i];
-					waves.erase(waves.begin()+i);
+					//Once a wave has become invisible it is deleted
+					//This means we are not allowing fully invisible waves to be on screen at all
+					if(waves[i]->getColor() < 0.0){
+						lockWave(waves[i]);
+						delete waves[i];
+						waves.erase(waves.begin()+i);
+					}
 				}
 			}
+			SDL_UnlockMutex(waveMutex);
 		}
 	}
 
 	void renderWaves(){
-		for(int i=0; i < waves.size(); i++){
-			waves[i]->render();
+		if(SDL_LockMutex(waveMutex)==0){
+			for(int i=waves.size()-1; i >=0; i--){
+				waves[i]->render();
+			}
+			SDL_UnlockMutex(waveMutex);
 		}
 	}
 };
