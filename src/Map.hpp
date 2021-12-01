@@ -163,7 +163,7 @@ class Map {
     waves->updateWaves(dt);
     
 		updateNpcs(dt, player);
-    if (rand()%300==0) { 
+    if (rand()%1000==0) { 
       lightning->update(dt,true,rand()%300+100);
       for (auto t:tiles) t->lightUp(); 
     }

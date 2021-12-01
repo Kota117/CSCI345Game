@@ -65,7 +65,8 @@ public:
       x=newX;
       a->setTransparency(255);
     }
-    if(a->getTransparency() > 0) a->decTransparency(5);
+    if(a->getTransparency() > 0) a->decTransparency(3);
+    if (a->getTransparency() == 60) Mix_PlayChannel(-1,sounds["thunder"],0);
     a->update(dt);
     dest.x = x;
     dest.y = y;
