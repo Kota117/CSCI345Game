@@ -8,27 +8,23 @@
 #include "Animation.hpp"
 #include "MediaManager.hpp"
 #include "Config.hpp"
-#include "Wave.hpp"
 
 using namespace std;
 
-class Tile:public Particle{
+class Lightning:public Particle{
   Config *cfg;
   SDL_Renderer *ren;
   MediaManager *media;
 
   map<string,Animation *> animations;
   map<string, Mix_Chunk *> sounds;
-
-  string tileType;
   
 protected:
   Animation *a;
   SDL_Rect dest;
-  Waves *waves;
 
 public:
-  Tile(MediaManager *newMedia, SDL_Renderer *newRen, Config *newCfg, string newType,
+  Lightning(MediaManager *newMedia, SDL_Renderer *newRen, Config *newCfg,
   double newx=0.0, double newy=0.0,
   double newv=0.0, int newtheta=0,
   double newax=0.0, double neway=0.0,
@@ -55,40 +51,21 @@ public:
 			sounds[sound] = media->readSound(sound);
     }
 
-    y = newy-dest.w;
-    
-    tileType = newType;
-
-    if (tileType == "floor") setFloor();
-    else if (tileType == "ceiling") setCeiling();
-    else if (tileType == "lWall") setLWall();
-    else if (tileType == "rWall") setRWall();
+    y = 0;
+    a->setTransparency(0);
   }
 
   SDL_Rect *getDest() { return &dest; }
-  string getType() { return tileType; }
   
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); y+=dest.w+1; }
-  void setCeiling() { setAnimation(animations["ceiling"]); }
-  void setLWall() { setAnimation(animations["lWall"]); }
-  void setRWall() { setAnimation(animations["rWall"]); }
-  
-  void lightUp() { a->setTransparency(255); }
-
-  bool collide(SDL_Rect* pDest) {
-    SDL_bool collision = SDL_HasIntersection(&dest, pDest);
-    if (collision)  {
-      lightUp();
-      return true;
+  void update(double dt, bool flashed=0, int newX=0) {
+    if (flashed) {
+      x=newX;
+      a->setTransparency(255);
     }
-    return false;
-  }
-
-  void update(double dt) {
-    if(a->getTransparency() > 0) a->decTransparency(1);
+    if(a->getTransparency() > 0) a->decTransparency(5);
     a->update(dt);
     dest.x = x;
     dest.y = y;
@@ -98,7 +75,7 @@ public:
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
   }
 
-  ~Tile() {
+  ~Lightning() {
     for (auto a:animations) delete a.second;
     for (auto s:sounds) delete s.second;
   }

@@ -13,6 +13,7 @@
 #include "NPC.hpp"
 #include "Tile.hpp"
 #include "Config.hpp"
+#include "Lightning.hpp"
 
 class Map {
   Config *cfg;
@@ -26,6 +27,9 @@ class Map {
 
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
+
+  Config *lightningConf;
+  Lightning *lightning;
 
   int playerStartX, playerStartY;
   int tileWidth;
@@ -45,6 +49,9 @@ class Map {
     
     tileConfs["tile"] = (new Config("tile"));
     tileWidth=stoi((*tileConfs["tile"])["width"]);
+
+    lightningConf = new Config("lightning");
+    lightning=new Lightning(media, ren, lightningConf);
   }
 
   Tile *operator[] (int index) {
@@ -156,6 +163,11 @@ class Map {
     waves->updateWaves(dt);
     
 		updateNpcs(dt, player);
+    if (rand()%300==0) { 
+      lightning->update(dt,true,rand()%300+100);
+      for (auto t:tiles) t->lightUp(); 
+    }
+    else lightning->update(dt);
 		for (auto t:tiles){
       t->update(dt);
       hasCollision = waves->collideSound(t);
@@ -171,6 +183,7 @@ class Map {
   void render(Player *player){
     waves->renderWaves();
     player->render();
+    lightning->render();
     for (auto t:tiles) t->render();
     for (auto e:npcs) e->render();
   }
