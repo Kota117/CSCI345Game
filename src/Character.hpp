@@ -142,12 +142,14 @@ class Character:public Particle{
 	}
 
 	void jump(){
-		inAir = true;
-		vy = -baseSpeed;
-		ay = 50;
+		if (!inAir){
+			inAir = true;
+			vy = -baseSpeed;
+			ay = 50;
 		
-		setAnimation(animations["jump"]);
-		waves->createWave(sounds["footstep"], x+32, y+32);
+			setAnimation(animations["jump"]);
+			waves->createWave(sounds["footstep"], x+32, y+32);
+		}
 	}
 
 	virtual void update(double dt){
