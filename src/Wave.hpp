@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <math.h>
+#include <mutex>
+#include <SDL_mutex.h>
 
 #include "Particle.hpp"
 #include "MediaManager.hpp"
@@ -18,12 +20,14 @@ class Wave{
 	int size;
 	double decayRate;
 
+
+
 	public:
 	Wave(SDL_Renderer *newRen, int startX, int startY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double newDecayRate=100, int newSize=3){
+
 		
 		ren = newRen;
-
 		color = startColor;
 		decayRate = newDecayRate;
 		size=newSize;
@@ -35,6 +39,7 @@ class Wave{
 		 	particles[i]->setBound();
         }
 	}
+	bool waveLock=0;
 
 	Particle *operator[] (int index) {
 		return particles[index];
@@ -74,10 +79,12 @@ class Wave{
 class Waves{
 	SDL_Renderer *ren;
 	vector <Wave *> waves;
+	SDL_mutex *waveMutex;
 
 	public:
 	Waves(SDL_Renderer *newRen){
 		ren=newRen;
+		waveMutex= SDL_CreateMutex();
 	}
 
 	Wave *operator[] (int index) {
@@ -86,46 +93,70 @@ class Waves{
 
 	void createWave(Mix_Chunk *sound, int startingX, int startingY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double decayRate=100, int size=3){
-
+		
 		//we could associate these properties with the actual sounds and have them read in config style. That may be a good choice
-		waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
+		if(SDL_LockMutex(waveMutex)==0){
+			waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
+			SDL_UnlockMutex(waveMutex);
+		}
 		Mix_PlayChannel(-1,sound,0);
 	}
 
 	void deleteWaves() {
+		//SDL_LockMutex(waveMutex);
 		while (waves.size()>0){ waves.erase(waves.begin());}
+		//SDL_UnlockMutex(waveMutex);
 	}
 
 	bool collideSound(Particle *newP) {
 		bool hasCollision = false;
-		for(auto w:waves){
-			for(int i=0; i<360; i++) {
-				if((*w)[i]->collide(newP)){
-					hasCollision = true;
+		if(SDL_LockMutex(waveMutex)==0){
+			for(auto w:waves){
+				for(int i=0; i<360; i++) {
+					if((*w)[i]->collide(newP)){
+						hasCollision = true;
+					}
 				}
 			}
+			SDL_UnlockMutex(waveMutex);
 		}
 		return hasCollision;
 	}
 
-	void updateWaves(double dt){
-		if(waves.size() > 0){
-			for(int i=0; i < waves.size(); i++){
-				waves[i]->update(dt);
+	void lockWave(Wave *wave){
+		wave->waveLock=true;
+	}
+	void unlockWave(Wave *wave){
+		wave->waveLock=false;
+	}
 
-				//Once a wave has become invisible it is deleted
-				//This means we are not allowing fully invisible waves to be on screen at all
-				if(waves[i]->getColor() < 0.0){
-					delete waves[i];
-					waves.erase(waves.begin()+i);
+	void updateWaves(double dt){
+		if(SDL_LockMutex(waveMutex)==0){
+			if(waves.size() > 0){
+				for(int i=waves.size()-1; i >=0; i--){
+					if(!waves[i]->waveLock){
+						waves[i]->update(dt);
+					}
+
+					//Once a wave has become invisible it is deleted
+					//This means we are not allowing fully invisible waves to be on screen at all
+					if(waves[i]->getColor() < 0.0){
+						lockWave(waves[i]);
+						delete waves[i];
+						waves.erase(waves.begin()+i);
+					}
 				}
 			}
+			SDL_UnlockMutex(waveMutex);
 		}
 	}
 
 	void renderWaves(){
-		for(int i=0; i < waves.size(); i++){
-			waves[i]->render();
+		if(SDL_LockMutex(waveMutex)==0){
+			for(int i=waves.size()-1; i >=0; i--){
+				waves[i]->render();
+			}
+			SDL_UnlockMutex(waveMutex);
 		}
 	}
 };

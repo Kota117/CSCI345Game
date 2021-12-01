@@ -34,7 +34,7 @@ class Map {
   int playerStartX, playerStartY;
   int tileWidth;
 
-  
+
 
   public:
   Map(MediaManager *newMedia, SDL_Renderer *newRen, Waves* newWaves, Config *newCfg) {

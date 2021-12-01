@@ -55,7 +55,6 @@ class Particle {
 
 		vx+=ax*dt; vy+=ay*dt;
 		x+=vx*dt; y+=vy*dt;
-
 	}
 
 	void updateCartesian(double dt){
