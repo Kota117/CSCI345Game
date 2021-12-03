@@ -147,7 +147,7 @@ class Character:public Particle{
 			vy = -baseSpeed;
 			ay = 50;
 		
-			setAnimation(animations["jump"]);
+			setAnimation(animations["jumpRight"]);
 			waves->createWave(sounds["footstep"], x+32, y+32);
 		}
 	}
