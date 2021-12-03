@@ -55,7 +55,7 @@ public:
 			sounds[sound] = media->readSound(sound);
     }
 
-    y = newy-dest.w;
+    y = newy-dest.h;
     
     tileType = newType;
 
@@ -67,14 +67,16 @@ public:
 
   SDL_Rect *getDest() { return &dest; }
   string getType() { return tileType; }
+  double getX() { return x; }
+  double getY() { return y; }
   
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); y+=dest.w+1; }
+  void setFloor() { setAnimation(animations["floor"]); y+=dest.h-1; }
   void setCeiling() { setAnimation(animations["ceiling"]); }
-  void setLWall() { setAnimation(animations["lWall"]); }
-  void setRWall() { setAnimation(animations["rWall"]); }
+  void setLWall() { setAnimation(animations["lWall"]); x-=5; }
+  void setRWall() { setAnimation(animations["rWall"]); x+=5; }
   
   void lightUp() { a->setTransparency(255); }
 

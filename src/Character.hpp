@@ -11,6 +11,8 @@
 #include "Wave.hpp"
 #include "Tile.hpp"
 
+#define GRAVITY 98
+
 using namespace std;
 
 enum direction{LEFT, RIGHT, STOP};
@@ -24,10 +26,9 @@ class Character:public Particle{
 	map<string,Mix_Chunk *> sounds;
 
 	double baseSpeed;
-    int timeMoving;
-	bool inAir;
+	int timeMoving;
 	direction dir;
-	bool clapped;
+	bool clapped, inAir, onTile;
 
 	protected:
 	Animation *a;
@@ -39,7 +40,7 @@ class Character:public Particle{
 	Character(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
-		double newax=0.0, double neway=0.0,
+		double newax=0.0, double neway=GRAVITY,
 		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp, true){
 
 		ren=newRen;
@@ -47,9 +48,10 @@ class Character:public Particle{
 		cfg=newCfg;
 		waves=newWaves;
 		timeMoving=0;
-		inAir = false;
+		inAir = true;
 		dir=STOP;
 		clapped=false;
+		onTile=true;
 
 		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
 		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
@@ -111,7 +113,7 @@ class Character:public Particle{
 		}
 	}
 
-    void stopFalling(){
+	void stopFalling(){
 		inAir=false;
 		vy=0;
 		ay=0;
@@ -119,19 +121,20 @@ class Character:public Particle{
 		if(vx>0){
 			waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
 			setAnimation(animations["walkRight"]);
-		}else if(vx<0){
+		} else if(vx<0){
 			waves->createWave(sounds["footstep"], x, y+(dest.h-3));
 			setAnimation(animations["walkLeft"]);
-		}else{
+		} else{
 			waves->createWave(sounds["footstep"], x, y+(dest.h-3));
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
 	}
 
-	void hitWall(Tile *t) {
+	void hitTile(Tile *t) {
 		vx=0;
-		if (t->getType() == "lWall") x-=1;
-		else if (t->getType() == "rWall") x+=1;
+		if (t->getType() == "lWall") x = t->getX()-dest.w-1;
+		else if (t->getType() == "rWall") x = t->getX()+dest.w+1;
+		else if (t->getType() == "floor") y = t->getY()-dest.h-1; 
 	}
 
 	void clap(){
@@ -145,10 +148,33 @@ class Character:public Particle{
 		if (!inAir){
 			inAir = true;
 			vy = -baseSpeed;
-			ay = 50;
+			ay = GRAVITY;
 		
 			setAnimation(animations["jump"]);
 			waves->createWave(sounds["footstep"], x+32, y+32);
+		}
+	}
+
+	void collisions(vector<Tile *> tiles) {	
+		SDL_Rect temp = dest;
+		temp.h+=2;
+		for (auto &t:tiles) {
+      if (t->collide(&dest)){
+				hitTile(t);
+				if (t->getType() == "floor" && inAir) { stopFalling(); }
+      	else if (t->getType() == "ceiling"){ setVY(0); }
+      }
+		}
+		for (auto &t:tiles) {
+			if (t->collide(&temp)) {
+				onTile=true;
+				break;
+			}
+			onTile=false;
+    }
+		if (!onTile) {
+			ay=GRAVITY;
+			inAir=true;
 		}
 	}
 

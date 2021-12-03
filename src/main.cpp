@@ -47,7 +47,7 @@ class MyGame:public Game {
 		level->initMap(currentLevel);
 
 		playerConf = new Config("player");
-		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY()+32);
+		player = new Player(media, ren, waves, playerConf, level->getStartX(), level->getStartY());
 
 		Mix_PlayChannel(-1,backgroundMusic,-1);
 
@@ -71,7 +71,7 @@ class MyGame:public Game {
 		newLevel->initMap(levelName);
 		level = newLevel;
 		player->setX(level->getStartX());
-		player->setY(level->getStartY()-32);
+		player->setY(level->getStartY());
 
 		delete oldLevel;
 		currentLevel = levelName;
