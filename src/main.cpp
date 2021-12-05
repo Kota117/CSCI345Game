@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include <map>
 #include <math.h>
@@ -135,15 +136,134 @@ class MyGame:public Game {
 	}
 };
 
+int mainMenu(){
+	SDL_Window *window;                    // Declare a pointer
+
+    SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
+	TTF_Init();	
+	int w = 640;
+	int h = 480;
+    // Create an application window with the following settings:
+    window = SDL_CreateWindow(
+        "Main Menu",                  // window title
+        SDL_WINDOWPOS_UNDEFINED,           // initial x position
+        SDL_WINDOWPOS_UNDEFINED,           // initial y position
+        w,                               // width, in pixels
+        h,                               // height, in pixels
+        SDL_WINDOW_OPENGL                  // flags - see below
+    );
+
+    // Check that the window was successfully created
+    if (window == NULL) {
+        // In the case that the window could not be made...
+        printf("Could not create window: %s\n", SDL_GetError());
+        return 1;
+    }
+
+	SDL_Renderer *ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	// SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
+
+	// SDL_Rect rect = {0, 0, 100, 100};
+	SDL_Color black = {0, 0, 0, 255};
+	SDL_Color white = { 225, 255, 255, 255};
+	SDL_Color grey = {120, 120, 120, 255};
+
+	TTF_Font *font = TTF_OpenFont("media/fonts/aovel-sans-rounded-font/AovelSansRounded-rdDL.ttf", 25);
+	SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", white);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
+
+	int texW = 0;
+	int texH = 0;
+	SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+
+	SDL_Rect dstrect = {w/2 - texW/2, h/2 - texH/2, texW, texH};
+
+	// The window is open: could enter program loop here (see SDL_PollEvent())
+	bool done = false;
+	while (!done) {
+        SDL_Event e;
+		
+		int x, y;
+		Uint32 buttons;
+
+		SDL_PumpEvents();
+
+		buttons = SDL_GetMouseState(&x, &y);
+
+		// SDL_Log("Mouse cursor is at %d, %d", x, y);
+
+        if (SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT){ 
+				done=true; 
+				break;
+			}else if(e.type == SDL_MOUSEBUTTONDOWN){
+			
+				TTF_CloseFont(font);
+				SDL_DestroyTexture(texture);
+				SDL_FreeSurface(surface);
+				// Close and destroy the window
+				SDL_DestroyWindow(window);
+
+				// Clean up
+				TTF_Quit();
+				SDL_Quit();
+				return 1;
+			}
+		}
+
+		// make black background
+		SDL_SetRenderDrawColor(ren, black.r, black.g, black.b, black.a);
+		SDL_RenderClear(ren);
+	
+		// SDL_Rect dstrect = {w/2 - texW/2, h/2 - texH/2, texW, texH};
+
+		// handle mouseover
+		if (x > w/2 - texW/2 && y > h/2 - texH/2 && x < w/2 + texW/2 && y < h/2 + texH/2){
+			// set box color white
+			SDL_SetRenderDrawColor(ren, 255,255,255,255);
+			SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", black);
+			SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
+		}else{
+			// set box color black
+			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+			SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", white);
+			SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
+			// probably need to use this instead
+			// SDL_UpdateTexture()
+		}
+
+		SDL_RenderFillRect(ren, &dstrect);
+		SDL_RenderCopy(ren, texture, NULL, &dstrect);
+
+		SDL_RenderPresent(ren);
+    }
+
+	TTF_CloseFont(font);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+
+    // Close and destroy the window
+    SDL_DestroyWindow(window);
+
+    // Clean up
+	TTF_Quit();
+    SDL_Quit();
+    return 0;
+}
+
 int main(int argc, char* argv[]) {
-	try {
-		Config gameConf("game");
 
-		MyGame g(gameConf);
+	int startGame = mainMenu();
+	if(startGame){
+		try {
+			Config gameConf("game");
 
-		g.run();
-	} catch (Exception e) {
-		cerr << e;
+			MyGame g(gameConf);
+
+			g.run();
+		} catch (Exception e) {
+			cerr << e;
+		}
 	}
     return 0;
 }
