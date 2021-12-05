@@ -161,15 +161,13 @@ int mainMenu(){
     }
 
 	SDL_Renderer *ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	// SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
 
-	// SDL_Rect rect = {0, 0, 100, 100};
 	SDL_Color black = {0, 0, 0, 255};
 	SDL_Color white = { 225, 255, 255, 255};
 	SDL_Color grey = {120, 120, 120, 255};
 
 	TTF_Font *font = TTF_OpenFont("media/fonts/aovel-sans-rounded-font/AovelSansRounded-rdDL.ttf", 25);
-	SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", white);
+	SDL_Surface *surface = TTF_RenderText_Solid(font, "Start Game", white);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
 
 	int texW = 0;
@@ -190,24 +188,24 @@ int mainMenu(){
 
 		buttons = SDL_GetMouseState(&x, &y);
 
-		// SDL_Log("Mouse cursor is at %d, %d", x, y);
-
         if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT){ 
 				done=true; 
 				break;
 			}else if(e.type == SDL_MOUSEBUTTONDOWN){
-			
-				TTF_CloseFont(font);
-				SDL_DestroyTexture(texture);
-				SDL_FreeSurface(surface);
-				// Close and destroy the window
-				SDL_DestroyWindow(window);
+			 	if (x > w/2 - texW/2 && y > h/2 - texH/2 && x < w/2 + texW/2 && y < h/2 + texH/2){	
+					TTF_CloseFont(font);
+					SDL_DestroyTexture(texture);
+					SDL_FreeSurface(surface);
 
-				// Clean up
-				TTF_Quit();
-				SDL_Quit();
-				return 1;
+					// Close and destroy the window
+					SDL_DestroyWindow(window);
+
+					// Clean up
+					TTF_Quit();
+					SDL_Quit();
+					return 1;
+				}
 			}
 		}
 
@@ -215,21 +213,17 @@ int mainMenu(){
 		SDL_SetRenderDrawColor(ren, black.r, black.g, black.b, black.a);
 		SDL_RenderClear(ren);
 	
-		// SDL_Rect dstrect = {w/2 - texW/2, h/2 - texH/2, texW, texH};
-
 		// handle mouseover
 		if (x > w/2 - texW/2 && y > h/2 - texH/2 && x < w/2 + texW/2 && y < h/2 + texH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
-			SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", black);
-			SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
+			surface = TTF_RenderText_Solid(font, "TESTING", black);
+			texture = SDL_CreateTextureFromSurface(ren, surface);
 		}else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-			SDL_Surface *surface = TTF_RenderText_Solid(font, "TESTING", white);
-			SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
-			// probably need to use this instead
-			// SDL_UpdateTexture()
+			surface = TTF_RenderText_Solid(font, "TESTING", white);
+			texture = SDL_CreateTextureFromSurface(ren, surface);
 		}
 
 		SDL_RenderFillRect(ren, &dstrect);
