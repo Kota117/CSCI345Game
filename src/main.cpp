@@ -166,17 +166,26 @@ int mainMenu(){
 	SDL_Color white = { 225, 255, 255, 255};
 	SDL_Color grey = {120, 120, 120, 255};
 
-	TTF_Font *font = TTF_OpenFont("media/fonts/aovel-sans-rounded-font/AovelSansRounded-rdDL.ttf", 25);
-	SDL_Surface *surface = TTF_RenderText_Solid(font, "Start Game", white);
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
+	TTF_Font *AovelSansRounded = TTF_OpenFont("media/fonts/aovel-sans-rounded-font/AovelSansRounded-rdDL.ttf", 25);
+	
+	SDL_Surface *startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Start Game", white);
+	SDL_Texture *startButtonTexture = SDL_CreateTextureFromSurface(ren, startButtonSurface);
 
-	int texW = 0;
-	int texH = 0;
-	SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+	SDL_Surface *l2ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", white);
+	SDL_Texture *l2ButtonTexture = SDL_CreateTextureFromSurface(ren, l2ButtonSurface);
 
-	SDL_Rect dstrect = {w/2 - texW/2, h/2 - texH/2, texW, texH};
 
-	// The window is open: could enter program loop here (see SDL_PollEvent())
+	int startTextW = 0;
+	int startTextH = 0;
+	int l2TextW = 0;
+	int l2TextH = 0;
+	
+	SDL_QueryTexture(startButtonTexture, NULL, NULL, &startTextW, &startTextH);
+	SDL_QueryTexture(l2ButtonTexture, NULL, NULL, &l2TextW, &l2TextH);
+
+	SDL_Rect startDestRect = {w/2 - startTextW/2, h/2 - startTextH/2, startTextW, startTextH};
+	SDL_Rect l2DestRect = {w/2 + l2TextW, h/2 - l2TextH/2, l2TextW, l2TextH};
+
 	bool done = false;
 	while (!done) {
         SDL_Event e;
@@ -193,10 +202,13 @@ int mainMenu(){
 				done=true; 
 				break;
 			}else if(e.type == SDL_MOUSEBUTTONDOWN){
-			 	if (x > w/2 - texW/2 && y > h/2 - texH/2 && x < w/2 + texW/2 && y < h/2 + texH/2){	
-					TTF_CloseFont(font);
-					SDL_DestroyTexture(texture);
-					SDL_FreeSurface(surface);
+			 	if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){	
+					TTF_CloseFont(AovelSansRounded);
+					SDL_DestroyTexture(startButtonTexture);
+					SDL_FreeSurface(startButtonSurface);
+
+					SDL_DestroyTexture(l2ButtonTexture);
+					SDL_FreeSurface(l2ButtonSurface);
 
 					// Close and destroy the window
 					SDL_DestroyWindow(window);
@@ -213,28 +225,48 @@ int mainMenu(){
 		SDL_SetRenderDrawColor(ren, black.r, black.g, black.b, black.a);
 		SDL_RenderClear(ren);
 	
-		// handle mouseover
-		if (x > w/2 - texW/2 && y > h/2 - texH/2 && x < w/2 + texW/2 && y < h/2 + texH/2){
+		// handle mouseover start button
+		if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
-			surface = TTF_RenderText_Solid(font, "TESTING", black);
-			texture = SDL_CreateTextureFromSurface(ren, surface);
+			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Start Game", black);
+			startButtonTexture = SDL_CreateTextureFromSurface(ren, startButtonSurface);
 		}else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-			surface = TTF_RenderText_Solid(font, "TESTING", white);
-			texture = SDL_CreateTextureFromSurface(ren, surface);
+			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Start Game", white);
+			startButtonTexture = SDL_CreateTextureFromSurface(ren, startButtonSurface);
 		}
 
-		SDL_RenderFillRect(ren, &dstrect);
-		SDL_RenderCopy(ren, texture, NULL, &dstrect);
+		SDL_RenderFillRect(ren, &startDestRect);
+		SDL_RenderCopy(ren, startButtonTexture, NULL, &startDestRect);
+
+		// handle mouseover l2 button
+		if (x > w/2 + l2TextW && y > h/2 - l2TextH/2 && x < w/2 + l2TextW*2 && y < h/2 + l2TextH/2){
+			// set box color white
+			SDL_SetRenderDrawColor(ren, 255,255,255,255);
+			l2ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", black);
+			l2ButtonTexture = SDL_CreateTextureFromSurface(ren, l2ButtonSurface);
+		}else{
+			// set box color black
+			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+			l2ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", white);
+			l2ButtonTexture = SDL_CreateTextureFromSurface(ren, l2ButtonSurface);
+		}
+
+		SDL_RenderFillRect(ren, &l2DestRect);
+		SDL_RenderCopy(ren, l2ButtonTexture, NULL, &l2DestRect);
 
 		SDL_RenderPresent(ren);
     }
 
-	TTF_CloseFont(font);
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(surface);
+	TTF_CloseFont(AovelSansRounded);
+	
+	SDL_DestroyTexture(startButtonTexture);
+	SDL_FreeSurface(startButtonSurface);
+
+	SDL_DestroyTexture(l2ButtonTexture);
+	SDL_FreeSurface(l2ButtonSurface);
 
     // Close and destroy the window
     SDL_DestroyWindow(window);
