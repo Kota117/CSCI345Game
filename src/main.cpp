@@ -110,12 +110,16 @@ class MyGame:public Game {
 				player->moveRight();
 
 			else if(keyEvent.key.keysym.sym==SDLK_SPACE)
-				player->jump();
+				if(player->isGrounded()){
+					player->jump();
+				}
 		}
 
 		if(player->isMoving()){ //for jumping while moving
 			if(keyEvent.key.keysym.sym==SDLK_SPACE)
+			if(player->isGrounded()){
 				player->jump();
+			}
 		}
 		
 		if(keyEvent.key.keysym.sym==SDLK_e)

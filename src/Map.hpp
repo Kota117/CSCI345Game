@@ -121,7 +121,7 @@ class Map {
             tileType="empty";
         }
         placeTile(placeX, placeY, tileType);
-        placeX+=tileWidth;
+        placeX+=tileWidth-5;
       }
       placeX=0;
       placeY+=tileWidth;
@@ -142,7 +142,7 @@ class Map {
   void hitFloor(Player *player){
     for (auto t:tiles) {
       if (t->collide(player->getDest()) && (t->getType() == "floor")){
-        if(player->isInAir())
+        if(!player->isGrounded())
           player->stopFalling();
         player->setY(player->getY()-1);
       }else if (t->collide(player->getDest()) && (t->getType() == "ceiling")){
@@ -151,6 +151,7 @@ class Map {
       }
     }
   }
+  
 
   void onWall(Player *player) {
     for (auto &t:tiles) {
@@ -176,6 +177,8 @@ class Map {
         hasCollision=false;
       }
     }
+    //player->handleCollision(tiles, dt);
+    //player->setGrounded(player->checkGrounded(tiles));
     onWall(player);
     hitFloor(player);
   }

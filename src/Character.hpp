@@ -24,8 +24,11 @@ class Character:public Particle{
 	map<string,Mix_Chunk *> sounds;
 
 	double baseSpeed;
+	double jumpSpeed;
+	double gravity;
+
     int timeMoving;
-	bool inAir;
+	bool grounded;
 	direction dir;
 	bool clapped;
 
@@ -47,7 +50,7 @@ class Character:public Particle{
 		cfg=newCfg;
 		waves=newWaves;
 		timeMoving=0;
-		inAir = false;
+		grounded = true;
 		dir=STOP;
 		clapped=false;
 
@@ -57,7 +60,10 @@ class Character:public Particle{
 		y=newy-dest.h;
 
 		baseSpeed = stod((*cfg)["baseSpeed"]);
+		jumpSpeed = stod((*cfg)["jumpSpeed"]);
+		gravity = stod((*cfg)["gravity"]);
 
+		ay=gravity;
 		vector<string> newAnimations = cfg->getMany("animations");
 		for(auto anim: newAnimations){
 			animations[anim] = new Animation();
@@ -76,7 +82,7 @@ class Character:public Particle{
 	//Basic Getters
 	bool isMoving() { return vx!=0 || vy != 0; }
 	SDL_Rect *getDest(){return &dest;}
-	bool isInAir() { return inAir;}
+	bool isGrounded() { return grounded;}
 
 	//Basic Setters
 	void setClap(bool x) { clapped = x; }
@@ -110,9 +116,20 @@ class Character:public Particle{
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
 	}
+	void setGrounded(bool groundedVar) { 
+		grounded=groundedVar;
+	}
+	bool checkGrounded(vector<Tile *> &tiles){
+		for (auto aTile : tiles){
+			if (aTile->inside(x + (dest.w / 2), y + dest.h + 1) || aTile->inside(x + (dest.w), y + dest.h + 1) ||
+				aTile->inside(x, y + dest.h + 1))
+				return true;
+		}
+		return false;
+	}
 
     void stopFalling(){
-		inAir=false;
+		grounded=true;
 		vy=0;
 		ay=0;
 		timeMoving=0;
@@ -141,21 +158,20 @@ class Character:public Particle{
 		}
 	}
 
+
+
 	void jump(){
-		if (!inAir){
-			inAir = true;
-			vy = -baseSpeed;
-			ay = 50;
+			grounded = false;
+			vy = -jumpSpeed;
+			ay = gravity;
 		
 			setAnimation(animations["jump"]);
 			waves->createWave(sounds["footstep"], x+32, y+32);
-		}
 	}
 
 	virtual void update(double dt){
 		Particle::update(dt);
-
-		if(timeMoving >= 1000 && !inAir){
+		if(timeMoving >= 1000 && grounded){
 			timeMoving%=500;
 			if(dir==LEFT)
 				waves->createWave(sounds["footstep"], x, y+dest.h);
