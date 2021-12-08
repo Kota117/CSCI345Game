@@ -69,6 +69,7 @@ public:
   string getType() { return tileType; }
   double getX() { return x; }
   double getY() { return y; }
+  double getW() { return dest.w; }
   
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }

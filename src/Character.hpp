@@ -134,7 +134,7 @@ class Character:public Particle{
 	void hitTile(Tile *t) {
 		vx=0;
 		if (t->getType() == "lWall") x = t->getX()-dest.w-1;
-		else if (t->getType() == "rWall") x = t->getX()+dest.w+1;
+		else if (t->getType() == "rWall") x = t->getX()+t->getW()+dest.w+1;
 		else if (t->getType() == "floor") y = t->getY()-dest.h-1; 
 	}
 
