@@ -11,7 +11,7 @@
 #include "Wave.hpp"
 #include "Tile.hpp"
 
-#define GRAVITY 98
+#define GRAVITY 300
 
 using namespace std;
 
@@ -25,7 +25,7 @@ class Character:public Particle{
 	map<string,Animation *> animations;
 	map<string,Mix_Chunk *> sounds;
 
-	double baseSpeed;
+	double baseSpeed, jumpSpeed;
 	int timeMoving;
 	direction dir;
 	bool clapped, inAir, onTile;
@@ -59,6 +59,7 @@ class Character:public Particle{
 		y=newy-dest.h;
 
 		baseSpeed = stod((*cfg)["baseSpeed"]);
+		jumpSpeed = stod((*cfg)["jumpSpeed"]);
 
 		vector<string> newAnimations = cfg->getMany("animations");
 		for(auto anim: newAnimations){
@@ -147,7 +148,7 @@ class Character:public Particle{
 	void jump(){
 		if (!inAir){
 			inAir = true;
-			vy = -baseSpeed;
+			vy = jumpSpeed;
 			ay = GRAVITY;
 		
 			setAnimation(animations["jump"]);
