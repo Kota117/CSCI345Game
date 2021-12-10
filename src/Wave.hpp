@@ -39,7 +39,7 @@ class Wave{
 		 	particles[i]->setBound();
         }
 	}
-	bool waveLock=0;
+	//bool waveLock=0;
 
 	Particle *operator[] (int index) {
 		return particles[index];
@@ -123,25 +123,22 @@ class Waves{
 		return hasCollision;
 	}
 
-	void lockWave(Wave *wave){
+/*	void lockWave(Wave *wave){
 		wave->waveLock=true;
 	}
 	void unlockWave(Wave *wave){
 		wave->waveLock=false;
 	}
-
+*/
 	void updateWaves(double dt){
 		if(SDL_LockMutex(waveMutex)==0){
 			if(waves.size() > 0){
 				for(int i=waves.size()-1; i >=0; i--){
-					if(!waves[i]->waveLock){
-						waves[i]->update(dt);
-					}
+					waves[i]->update(dt);
 
 					//Once a wave has become invisible it is deleted
 					//This means we are not allowing fully invisible waves to be on screen at all
 					if(waves[i]->getColor() < 0.0){
-						lockWave(waves[i]);
 						delete waves[i];
 						waves.erase(waves.begin()+i);
 					}

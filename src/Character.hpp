@@ -40,7 +40,7 @@ class Character:public Particle{
 	Character(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
-		double newax=0.0, double neway=GRAVITY,
+		double newax=0.0, double neway=0.0,
 		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp, true){
 
 		ren=newRen;
