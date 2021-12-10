@@ -64,9 +64,9 @@ class Map {
   void placeTile(int x, int y, string type) {
     if(type=="player"){
       playerStartX=x;
-      playerStartY=y+16;
+      playerStartY=y;
     }else if(type=="basic" || type=="big"){
-      spawnNpc(x, y+tileWidth, type);
+      spawnNpc(x, y, type);
     }else if(type!="empty"){
       tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
     }
@@ -129,7 +129,10 @@ class Map {
   }
 
   void updateNpcs(double dt, Player *player) {
-    for (auto& e:npcs) e->update(dt, player->getX());
+    for (auto& e:npcs) {
+      e->update(dt, player->getX());
+      e->collisions(tiles);
+    }
 
     vector<int> locations;
     for (int i=0; i<npcs.size(); i++) {

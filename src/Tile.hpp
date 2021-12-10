@@ -74,7 +74,7 @@ public:
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); y+=dest.h-1; }
+  void setFloor() { setAnimation(animations["floor"]); y+=dest.h-5; }
   void setCeiling() { setAnimation(animations["ceiling"]); }
   void setLWall() { setAnimation(animations["lWall"]); x-=5; }
   void setRWall() { setAnimation(animations["rWall"]); x+=5; }
