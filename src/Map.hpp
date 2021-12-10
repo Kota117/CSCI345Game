@@ -147,12 +147,11 @@ class Map {
     waves->updateWaves(dt);
     
 		updateNpcs(dt, player);
-    if (rand()%1000==0) { 
-      lightning->update(dt,true,rand()%300+100);
-      for (auto t:tiles) t->lightUp(); 
+    if (rand()%1001==0) {
+      lightning->update(dt,tiles,true,rand()%300+100);
     }
-    else lightning->update(dt);
-		for (auto t:tiles){
+    else lightning->update(dt,tiles);
+		for (auto &t:tiles){
       t->update(dt);
       hasCollision = waves->collideSound(t);
       if(hasCollision){

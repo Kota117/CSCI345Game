@@ -60,13 +60,16 @@ public:
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void update(double dt, bool flashed=0, int newX=0) {
+  void update(double dt, vector<Tile *>&tiles , bool flashed=0, int newX=0) {
     if (flashed) {
       x=newX;
       a->setTransparency(255);
     }
     if(a->getTransparency() > 0) a->decTransparency(3);
-    if (a->getTransparency() == 60) Mix_PlayChannel(-1,sounds["thunder"],0);
+    if (a->getTransparency() == 60) {
+      Mix_PlayChannel(-1,sounds["thunder"],0);
+      for (auto &t:tiles) t->lightUp(); 
+    }
     a->update(dt);
     dest.x = x;
     dest.y = y;
