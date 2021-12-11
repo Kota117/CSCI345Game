@@ -49,20 +49,27 @@ int mainMenu(){
 	SDL_Surface *l3ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", white);
 	SDL_Texture *l3ButtonTexture = SDL_CreateTextureFromSurface(ren, l3ButtonSurface);
 
+	SDL_Surface *instructionsSurface = TTF_RenderText_Solid(AovelSansRounded, "Find the key and unlock the door to escape.", white);
+	SDL_Texture *instructionsTexture = SDL_CreateTextureFromSurface(ren, instructionsSurface);
+
 	int startTextW = 0;
 	int startTextH = 0;
 	int l2TextW = 0;
 	int l2TextH = 0;
 	int l3TextW = 0;
 	int l3TextH = 0;
+	int instructionsTextW = 0;
+	int instructionsTextH = 0;
 
 	SDL_QueryTexture(startButtonTexture, NULL, NULL, &startTextW, &startTextH);
 	SDL_QueryTexture(l2ButtonTexture, NULL, NULL, &l2TextW, &l2TextH);
 	SDL_QueryTexture(l3ButtonTexture, NULL, NULL, &l3TextW, &l3TextH);
+	SDL_QueryTexture(instructionsTexture, NULL, NULL, &instructionsTextW, &instructionsTextH);
 
 	SDL_Rect startDestRect = {w/2 - startTextW/2, h/2 - startTextH/2, startTextW, startTextH};
 	SDL_Rect l2DestRect = {w/2 + l2TextW, h/2 - l2TextH/2, l2TextW, l2TextH};
 	SDL_Rect l3DestRect = {w/2 - 2*l3TextW, h/2 - l3TextH/2, l3TextW, l3TextH};
+	SDL_Rect instructionsDestRect = {w/2 - instructionsTextW/2, h/2 + instructionsTextH * 2, instructionsTextW, instructionsTextH};
 
 	bool done = false;
 	while (!done) {
@@ -90,6 +97,9 @@ int mainMenu(){
 
 					SDL_DestroyTexture(l3ButtonTexture);
 					SDL_FreeSurface(l3ButtonSurface);
+
+					SDL_DestroyTexture(instructionsTexture);
+					SDL_FreeSurface(instructionsSurface);
 
 					// Close and destroy the window
 					SDL_DestroyWindow(window);
@@ -154,6 +164,10 @@ int mainMenu(){
 		SDL_RenderFillRect(ren, &l3DestRect);
 		SDL_RenderCopy(ren, l3ButtonTexture, NULL, &l3DestRect);
 
+		SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+		SDL_RenderFillRect(ren, &instructionsDestRect);
+		SDL_RenderCopy(ren, instructionsTexture, NULL, &instructionsDestRect);
+
 		SDL_RenderPresent(ren);
     }
 
@@ -167,6 +181,9 @@ int mainMenu(){
 
 	SDL_DestroyTexture(l3ButtonTexture);
 	SDL_FreeSurface(l3ButtonSurface);
+
+	SDL_DestroyTexture(instructionsTexture);
+	SDL_FreeSurface(instructionsSurface);
 
     // Close and destroy the window
     SDL_DestroyWindow(window);
@@ -200,6 +217,8 @@ int pauseMenu(){
         printf("Could not create window: %s\n", SDL_GetError());
         return 1;
     }
+
+	SDL_SetWindowInputFocus(window);
 
 	SDL_Renderer *ren = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
