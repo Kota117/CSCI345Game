@@ -33,6 +33,8 @@ win: $(WINBIN)
 win32: $(WIN32BIN)
 mac: $(MACBIN)
 linux: $(LINBIN)
+clean: 
+	rm bin/*
 
 run:
 ifeq ($(OS),Windows_NT)
