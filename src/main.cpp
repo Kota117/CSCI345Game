@@ -1,12 +1,12 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include <map>
 #include <math.h>
 #include <string>
 #include <SDL_mutex.h>
-
 
 #include "Exception.hpp"
 #include "MediaManager.hpp"
@@ -19,6 +19,7 @@
 #include "Config.hpp"
 #include "Tile.hpp"
 #include "Map.hpp"
+#include "Menus.hpp"
 
 using namespace std;
 
@@ -124,6 +125,10 @@ class MyGame:public Game {
 			levelChange("level1");
 		else if(keyEvent.key.keysym.sym==SDLK_2)
 			levelChange("level2");
+		else if(keyEvent.key.keysym.sym==SDLK_m){
+			cout << "Pressed m\n";
+			pauseMenu();
+		}
 		// else if(keyEvent.key.keysym.sym==SDLK_3)
 		// 	levelChange(3);
 
@@ -136,14 +141,18 @@ class MyGame:public Game {
 };
 
 int main(int argc, char* argv[]) {
-	try {
-		Config gameConf("game");
 
-		MyGame g(gameConf);
+	int startGame = mainMenu();
+	if(startGame){
+		try {
+			Config gameConf("game");
 
-		g.run();
-	} catch (Exception e) {
-		cerr << e;
+			MyGame g(gameConf);
+
+			g.run();
+		} catch (Exception e) {
+			cerr << e;
+		}
 	}
     return 0;
 }
