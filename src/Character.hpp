@@ -151,7 +151,10 @@ class Character:public Particle{
 			vy = jumpSpeed;
 			ay = GRAVITY;
 		
-			setAnimation(animations["jump"]);
+			if (vx<0)
+				setAnimation(animations["jumpLeft"]);
+			else
+				setAnimation(animations["jumpRight"]);
 			waves->createWave(sounds["footstep"], x+32, y+32);
 		}
 	}
