@@ -16,7 +16,8 @@ class Player:public Character{
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
 		double newax=0.0, double neway=0.0,
-		double newdamp=0.0):Character(newMedia, newRen, newWaves, playerConf, newx, newy, newv, newtheta, newax, neway, newdamp){}
+		double newvx=0.0, double newvy=0.0,
+		double newdamp=0.0):Character(newMedia, newRen, newWaves, playerConf, newx, newy, newv, newtheta, newax, neway, newvx, newvy, newdamp){}
 
 	~Player(){}
 };

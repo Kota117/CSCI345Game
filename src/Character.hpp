@@ -29,7 +29,6 @@ class Character:public Particle{
 	int timeMoving;
 	direction dir;
 	bool clapped, inAir, onTile;
-
 	protected:
 	Animation *a;
 	SDL_Rect dest;
@@ -40,8 +39,10 @@ class Character:public Particle{
 	Character(MediaManager *newMedia, SDL_Renderer *newRen, Waves *newWaves, Config *newCfg,
 		double newx=0.0, double newy=0.0,
 		double newv=0.0, int newtheta=0,
-		double newax=0.0, double neway=GRAVITY,
+		double newax=0.0, double neway=0.0,
+		double newvx=0.0, double newvy=0.0,
 		double newdamp=0.0):Particle(newx, newy, newv, newtheta, newax, neway, newdamp, true){
+		
 
 		ren=newRen;
 		media=newMedia;
@@ -52,6 +53,8 @@ class Character:public Particle{
 		dir=STOP;
 		clapped=false;
 		onTile=true;
+		vx = newvx;
+		vy = newvy;
 
 		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
 		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
@@ -79,8 +82,9 @@ class Character:public Particle{
 	//Basic Getters
 	bool isMoving() { return vx!=0 || vy != 0; }
 	SDL_Rect *getDest(){return &dest;}
-	bool isInAir() { return inAir;}
-
+	bool isInAir(){
+		return (inAir);
+	}
 	//Basic Setters
 	void setClap(bool x) { clapped = x; }
 	void setAnimation(Animation *newA){ a=newA; }
@@ -130,30 +134,84 @@ class Character:public Particle{
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
 	}
-
 	void hitTile(Tile *t) {
-		vx=0;
-		if (t->getType() == "lWall") x = t->getX()-dest.w-1;
-		else if (t->getType() == "rWall") x = t->getX()+t->getW()+dest.w+1;
+		if (t->getType() == "lWall"){
+			 x = t->getX()-dest.w-1;
+			vx=0;
+		}
+		else if (t->getType() == "rWall"){
+			x = t->getX()+t->getW()+dest.w+1;
+			vx=0;
+		}
 		else if (t->getType() == "floor") y = t->getY()-dest.h-1; 
 	}
+	
+/*
+	bool inside(int x, int y){
+		return (dest.x <=x && x <= dest.x + dest.w &&
+				dest.y <=y && y <= dest.y + dest.h);
+	}
 
+	bool detectCollision(Tile *aTile){
+		return ((inside(aTile->getX(), aTile->getY())) ||
+				(inside(aTile->getX() + aTile->getW(), aTile->getY() + aTile->getH())) ||
+				(inside(aTile->getX() + aTile->getW(), aTile->getY())) ||
+				(inside(aTile->getX(), aTile->getY() + aTile->getH())));
+	}
+
+	void handleCollision(vector<Tile *> &tiles, double dt)
+	{
+		for (auto aTile : tiles)
+		{
+			if(detectCollision(aTile)){
+				double dx = (dest.x + (dest.w / 2)) - (aTile->getX() + aTile->centerX());
+				double dy = (dest.y + (dest.h / 2)) - (aTile->getY() + aTile->centerY());
+				double shw = (dest.w / 2) + (aTile->getW() / 2);
+				double shh = (dest.h / 2) + (aTile->getH() /2);
+
+				if ((shw - abs(dx)) <= (shh - abs(dy))) {
+					x -= vx*dt;
+					vx = 0;
+				}
+				else if (vy >0) {
+					y += (vy * dt)-10;
+					stopFalling();
+				}
+				else if (vy <= 0){
+					y+= (vy * dt) + 1;
+					vy = 0;
+				}
+			}
+		}
+	}
+
+	void setInAir(bool airVar){
+		inAir = airVar;
+	}
+	bool checkInAir(vector<Tile *> &tiles){
+		for (auto aTile : tiles){
+			if(aTile->inside(x + (dest.w / 2), y + dest.h + 1) || aTile->inside(x + (dest.w), y + dest.h +1) ||
+				aTile->inside(x, y + dest.h + 1))
+				return false;
+		}
+		return true;
+	}
+*/
 	void clap(){
 		if (!clapped) {
 			waves->createWave(sounds["clap"], x+dest.w/2, y+dest.h/2);
 			setClap(true);
 		}
 	}
-
+	void setVy(double newVy){
+		vy=newVy;
+	}
 	void jump(){
-		if (!inAir){
-			inAir = true;
-			vy = jumpSpeed;
-			ay = GRAVITY;
-		
-			setAnimation(animations["jump"]);
-			waves->createWave(sounds["footstep"], x+32, y+32);
-		}
+		inAir = true;
+		vy = jumpSpeed;
+		setAnimation(animations["jump"]);
+		waves->createWave(sounds["footstep"], x+32, y+32);
+		if(vx < 0) FlipState = SDL_FLIP_HORIZONTAL;
 	}
 
 	void collisions(vector<Tile *> tiles) {	
@@ -178,9 +236,21 @@ class Character:public Particle{
 			inAir=true;
 		}
 	}
+	
 
 	virtual void update(double dt){
 		Particle::update(dt);
+		/*vx+=ax*dt; vy+=ay*dt;
+		if(inAir){
+			ay=GRAVITY;
+		}
+		else {
+			vy=0.0;
+			ay=0.0;
+		}
+
+		//x+=vx*dt; y+=vy*dt;
+*/
 
 		if(timeMoving >= 1000 && !inAir){
 			timeMoving%=500;
@@ -189,11 +259,10 @@ class Character:public Particle{
 			else
 				waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
 		}
- 
-		if(vx!=0)
-			timeMoving += (int)(dt*1000.0);
 
+		if(vx!=0) timeMoving += (int)(dt*1000.0);
 		a->update(dt);
+		if(vx < 0) FlipState = SDL_FLIP_HORIZONTAL;
 		dest.x = x;
 		dest.y = y;
 	}

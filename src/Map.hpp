@@ -157,6 +157,8 @@ class Map {
         hasCollision=false;
       }
     }
+    //player->handleCollision(tiles, dt);
+    //player->setInAir(player->checkInAir(tiles));
     player->collisions(tiles);
   }
 

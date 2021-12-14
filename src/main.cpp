@@ -79,8 +79,8 @@ class MyGame:public Game {
 
 	void update(double dt) {
 		level->update(dt, player);
-		player->update(dt);
 
+		player->update(dt);
 		tvStatic->update(dt);
 	}
 
@@ -93,7 +93,7 @@ class MyGame:public Game {
 		SDL_RenderPresent(ren);
 	}
 
-	void handleKeyUp(SDL_Event keyEvent) {
+	/*void handleKeyUp(SDL_Event keyEvent) {
 		if (keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT ||
 			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT
 		){
@@ -101,8 +101,66 @@ class MyGame:public Game {
 		}
 		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
 	}
-
+	*/
+	void handleKeyUp(SDL_Event keyEvent) {
+		if (keyEvent.type == SDL_KEYUP)
+		{
+			switch(keyEvent.key.keysym.sym)
+			{
+				case SDLK_LEFT:
+					player->stopMoving();
+					break;
+				case SDLK_a:
+					player->stopMoving();
+					break;
+				case SDLK_RIGHT:
+					player->stopMoving();
+					break;
+				case SDLK_d:
+					player->stopMoving();
+					break;
+				case SDLK_e:
+					player->setClap(false);
+					break;
+			}
+		}
+	}
 	void handleKeyDown(SDL_Event keyEvent) {
+		if(keyEvent.type == SDL_KEYDOWN){
+			switch (keyEvent.key.keysym.sym)
+			{
+				case SDLK_LEFT:
+					player->moveLeft();
+					break;
+				case SDLK_a:
+					player->moveLeft();
+					break;
+				case SDLK_RIGHT:
+					player->moveRight();
+					break;
+				case SDLK_d:
+					player->moveRight();
+					break;
+				case SDLK_SPACE:
+					if(!player->isInAir()){
+						player->jump();
+					}
+					break;
+				case SDLK_e:
+					player->clap();
+					break;
+				case SDLK_1:
+					levelChange("level1");
+					break;
+				case SDLK_2:
+					levelChange("level2");
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	/*void handleKeyDown(SDL_Event keyEvent) {
 		if(!player->isMoving()){
 			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT)
 				player->moveLeft();
@@ -128,6 +186,7 @@ class MyGame:public Game {
 		// 	levelChange(3);
 
 	}
+	*/
 
 	~MyGame() {
 		delete player;
