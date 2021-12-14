@@ -82,10 +82,10 @@ public:
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["block"]); }
-  void setCeiling() { setAnimation(animations["block"]); }
-  void setLWall() { setAnimation(animations["block"]); }
-  void setRWall() { setAnimation(animations["block"]); }
+  void setFloor() { setAnimation(animations["floor"]); }
+  void setCeiling() { setAnimation(animations["ceiling"]); }
+  void setLWall() { setAnimation(animations["lWall"]); }
+  void setRWall() { setAnimation(animations["rWall"]); }
   
   void lightUp() { a->setTransparency(255); }
 
