@@ -78,9 +78,10 @@ class MyGame:public Game {
 	}
 
 	void update(double dt) {
+		player->update(dt);
 		level->update(dt, player);
 
-		player->update(dt);
+
 		tvStatic->update(dt);
 	}
 
@@ -142,7 +143,7 @@ class MyGame:public Game {
 					player->moveRight();
 					break;
 				case SDLK_SPACE:
-					if(!player->isInAir()){
+					if(player->isOnTile()){
 						player->jump();
 					}
 					break;
