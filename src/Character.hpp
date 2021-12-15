@@ -124,8 +124,11 @@ class Character:public Particle{
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
 	}
-	void leave(){
-		hasLeft=true;
+	void setHasLeft(bool setter){
+		hasLeft=setter;
+	}
+	void setHasKey(bool setter){
+		hasKey=setter;
 	}
 	void collectedKey(){
 		cout << "BOO YAH!" << endl;
@@ -134,6 +137,9 @@ class Character:public Particle{
 	}
 	bool leftTheBuilding(){
 		return hasLeft;
+	}
+	void setUnlocked(bool setter){
+		unlocked = setter;
 	}
 	bool unlockedDoor(){
 		return unlocked;

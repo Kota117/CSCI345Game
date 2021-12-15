@@ -75,9 +75,10 @@ class MyGame:public Game {
 		level = newLevel;
 		player->setX(level->getStartX());
 		player->setY(level->getStartY());
-
 		delete oldLevel;
 		currentLevel = levelNum;
+		player->setHasKey(false);
+		player->setHasLeft(false);
 	}
 
 	void update(double dt) {
@@ -87,8 +88,9 @@ class MyGame:public Game {
 
 		tvStatic->update(dt);
 		if(player->unlockedDoor() && !player->leftTheBuilding()) { 
+			player->setHasLeft(true);
+			player->setUnlocked(false);
 			levelChange(currentLevel+1);
-			player->leave();
 			}
 		if(player->getY()>=player->getMaxY()){
 			player->setVY(0);
@@ -215,7 +217,7 @@ class MyGame:public Game {
 int main(int argc, char* argv[]) {
 
 	int startGame = mainMenu();
-	if(startGame){
+	if(startGame==1){
 		try {
 			Config gameConf("game");
 
