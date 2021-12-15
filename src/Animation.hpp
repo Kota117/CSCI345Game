@@ -10,7 +10,7 @@ class AnimationFrame{
 	int millis;
     
 	public:
-	AnimationFrame(int newMillis, int newX, int newY, int newW, int newH) {
+	AnimationFrame(int newMillis, int newX, int newY, int newW, int newH){
 		millis=newMillis;
 		frame.x = newX;
 		frame.y = newY;
@@ -18,9 +18,9 @@ class AnimationFrame{
 		frame.h = newH;
 	}
 
-	int getMillis() { return millis; }
+	int getMillis(){ return millis; }
 
-	SDL_Rect *getFrame() { return &frame; }
+	SDL_Rect *getFrame(){ return &frame; }
 };
 
 class Animation{
@@ -37,24 +37,29 @@ class Animation{
 	int transparency;
 
 	public:
-	Animation(int newTransparency=255) { 
-	  totalTime=0;
-	  currentTime=0;
-	  transparency=newTransparency;
+	Animation(int newTransparency=255){ 
+	  totalTime = 0;
+	  currentTime = 0;
+	  transparency = newTransparency;
 	}
 
-	int getTransparency() { return transparency; }
-	void setTransparency(int newTransparency) { 
-		transparency=newTransparency;
-		SDL_SetTextureAlphaMod(spriteSheet, transparency);
-	}
-	void decTransparency(int decrement) { 
-		transparency-=decrement;
+	int getTransparency(){ return transparency; }
+
+	void setTransparency(int newTransparency){ 
+		transparency = newTransparency;
+
 		SDL_SetTextureAlphaMod(spriteSheet, transparency);
 	}
 
-	void readAnimation(MediaManager *media,string newAnimationFile) {
+	void decTransparency(int decrement){ 
+		transparency -= decrement;
+
+		SDL_SetTextureAlphaMod(spriteSheet, transparency);
+	}
+
+	void readAnimation(MediaManager *media,string newAnimationFile){
 		newAnimationFile = "media/animations/" + newAnimationFile + ".txt";
+
 		if(newAnimationFile != animationFile){
 			animationFile = newAnimationFile;
 
@@ -64,41 +69,46 @@ class Animation{
 			in.open(animationFile);
 			in >> max >> sheetName;
 
-			spriteSheet=media->readImage(sheetName);
+			spriteSheet = media->readImage(sheetName);
 			SDL_SetTextureAlphaMod(spriteSheet, transparency);
 
 			int millis,x,y,w,h;
-			for (int i=0;i<max;i++) {
+
+			for (int i=0;i<max;i++){
 				in >> millis >> x >> y >> w >> h;
-				AnimationFrame *af=new AnimationFrame(millis, x, y, w, h);
+				AnimationFrame *af = new AnimationFrame(millis, x, y, w, h);
 				
 				frames.push_back(af);
-				totalTime+=af->getMillis(); 
+				totalTime += af->getMillis(); 
 			}
+
 			in.close();
 		}	
 	}
 
-	void update(double dt) {
-		currentTime+=(int)(dt*1000.0);
-		currentTime%=totalTime;
+	void update(double dt){
+		currentTime += (int)(dt*1000.0);
+		currentTime %= totalTime;
 	}
 
-	SDL_Rect *getFrame() {
-		int checkTime=0;
-		int t=0;
-		for (t=0;t<frames.size();t++) {
+	SDL_Rect *getFrame(){
+		int checkTime = 0;
+		int t = 0;
+
+		for (t=0;t<frames.size();t++){
 			if (checkTime+frames[t]->getMillis()>currentTime) 
 			  break;
-			checkTime+=frames[t]->getMillis();
+			checkTime += frames[t]->getMillis();
 		}
-		if (t==frames.size()) t=0;
+		
+		if (t==frames.size()) t = 0;
+
 		return frames[t]->getFrame();
 	}
 
 	SDL_Texture *getTexture(){ return spriteSheet; }
 
-	~Animation() {
+	~Animation(){
 		for (auto f:frames) 
 		  delete f;
 	}

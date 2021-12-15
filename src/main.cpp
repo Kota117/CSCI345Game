@@ -25,7 +25,7 @@
 
 using namespace std;
 
-class MyGame:public Game {
+class MyGame:public Game{
 	Waves *waves;
 
 	Config *playerConf;
@@ -40,12 +40,12 @@ class MyGame:public Game {
 	SDL_Rect *staticDest;
 
 	public:
-	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])) {
+	MyGame(Config &gameConf):Game(gameConf["name"], stoi(gameConf["screenW"]), stoi(gameConf["screenH"])){
 		backgroundMusic = media->readSound(gameConf["backgroundMusic"]);
 
 		waves = new Waves(ren);
 
-		currentLevel=1;
+		currentLevel = 1;
 		level = new Map(media, ren, waves, NULL);
 		level->initMap(currentLevel);
 
@@ -67,33 +67,41 @@ class MyGame:public Game {
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void levelChange(int levelNum) {
+	void levelChange(int levelNum){
 		Map *oldLevel = level;
 
 		Map *newLevel = new Map(media, ren, waves, NULL);
+
 		newLevel->initMap(levelNum);
 		level = newLevel;
+
 		player->setX(level->getStartX());
 		player->setY(level->getStartY());
+
 		delete oldLevel;
+
 		currentLevel = levelNum;
+
 		player->setHasKey(false);
 		player->setHasLeft(false);
 	}
 
-	void update(double dt) {
+	void update(double dt){
 		player->update(dt);
 		level->update(dt, player);
 
-
 		tvStatic->update(dt);
-		if(player->unlockedDoor() && !player->leftTheBuilding()) { 
+
+		if(player->unlockedDoor() && !player->leftTheBuilding()){ 
 			player->setHasLeft(true);
 			player->setUnlocked(false);
+
 			levelChange(currentLevel+1);
-			}
+		}
+
 		if(player->getY()>=player->getMaxY()){
 			player->setVY(0);
+
 			levelChange(currentLevel);
 		}
 	}
@@ -117,9 +125,8 @@ class MyGame:public Game {
 	}
 	*/
 
-	void handleKeyUp(SDL_Event keyEvent) {
-		switch(keyEvent.key.keysym.sym)
-		{
+	void handleKeyUp(SDL_Event keyEvent){
+		switch(keyEvent.key.keysym.sym){
 			case SDLK_LEFT:
 				player->stopMoving();
 				break;
@@ -137,9 +144,8 @@ class MyGame:public Game {
 				break;
 		}
 	}
-	void handleKeyDown(SDL_Event keyEvent) {
-		switch (keyEvent.key.keysym.sym)
-		{
+	void handleKeyDown(SDL_Event keyEvent){
+		switch(keyEvent.key.keysym.sym){
 			case SDLK_LEFT:
 				player->moveLeft();
 				break;
@@ -208,23 +214,23 @@ class MyGame:public Game {
 	}
 	*/
 
-	~MyGame() {
+	~MyGame(){
 		delete player;
 		delete waves;	
 	}
 };
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]){
 
 	int startGame = mainMenu();
 	if(startGame==1){
-		try {
+		try{
 			Config gameConf("game");
 
 			MyGame g(gameConf);
 
 			g.run();
-		} catch (Exception e) {
+		} catch(Exception e){
 			cerr << e;
 		}
 	}

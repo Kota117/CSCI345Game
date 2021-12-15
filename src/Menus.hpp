@@ -12,9 +12,11 @@ int mainMenu(){
 	SDL_Window *window;                    // Declare a pointer
 
     SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
-	TTF_Init();	
+	TTF_Init();
+
 	int w = 640;
 	int h = 480;
+
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
         "Main Menu",                  // window title
@@ -26,7 +28,7 @@ int mainMenu(){
     );
 
     // Check that the window was successfully created
-    if (window == NULL) {
+    if(window == NULL){
         // In the case that the window could not be made...
         printf("Could not create window: %s\n", SDL_GetError());
         return 1;
@@ -72,7 +74,8 @@ int mainMenu(){
 	SDL_Rect instructionsDestRect = {w/2 - instructionsTextW/2, h/2 + instructionsTextH * 2, instructionsTextW, instructionsTextH};
 
 	bool done = false;
-	while (!done) {
+
+	while (!done){
         SDL_Event e;
 		
 		int x, y;
@@ -82,11 +85,11 @@ int mainMenu(){
 
 		buttons = SDL_GetMouseState(&x, &y);
 
-        if (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT){ 
-				done=true; 
+        if(SDL_PollEvent(&e)){
+			if(e.type == SDL_QUIT){ 
+				done = true; 
 				break;
-			}else if(e.type == SDL_MOUSEBUTTONDOWN){
+			} else if(e.type == SDL_MOUSEBUTTONDOWN){
 			 	if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){	
 					TTF_CloseFont(AovelSansRounded);
 					SDL_DestroyTexture(startButtonTexture);
@@ -117,12 +120,12 @@ int mainMenu(){
 		SDL_RenderClear(ren);
 	
 		// handle mouseover start button
-		if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){
+		if(x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
 			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Start Game", black);
 			startButtonTexture = SDL_CreateTextureFromSurface(ren, startButtonSurface);
-		}else{
+		} else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
 			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Start Game", white);
@@ -133,12 +136,12 @@ int mainMenu(){
 		SDL_RenderCopy(ren, startButtonTexture, NULL, &startDestRect);
 
 		// handle mouseover l2 button
-		if (x > w/2 + l2TextW && y > h/2 - l2TextH/2 && x < w/2 + l2TextW*2 && y < h/2 + l2TextH/2){
+		if(x > w/2 + l2TextW && y > h/2 - l2TextH/2 && x < w/2 + l2TextW*2 && y < h/2 + l2TextH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
 			l2ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", black);
 			l2ButtonTexture = SDL_CreateTextureFromSurface(ren, l2ButtonSurface);
-		}else{
+		} else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
 			l2ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Two", white);
@@ -149,12 +152,12 @@ int mainMenu(){
 		SDL_RenderCopy(ren, l2ButtonTexture, NULL, &l2DestRect);
 
 		// handle mouseover l3 button
-		if (x > w/2 - 2*l3TextW && y > h/2 - l3TextH/2  &&  x < w/2 - l3TextW && y < h/2 + l3TextH/2){
+		if(x > w/2 - 2*l3TextW && y > h/2 - l3TextH/2  &&  x < w/2 - l3TextW && y < h/2 + l3TextH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
 			l3ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Three", black);
 			l3ButtonTexture = SDL_CreateTextureFromSurface(ren, l3ButtonSurface);
-		}else{
+		} else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
 			l3ButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Level Three", white);
@@ -198,9 +201,11 @@ int pauseMenu(){
 	SDL_Window *window;                    // Declare a pointer
 
     SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
-	TTF_Init();	
+	TTF_Init();
+
 	int w = 640;
 	int h = 480;
+
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
         "Pause Menu",                  // window title
@@ -212,7 +217,7 @@ int pauseMenu(){
     );
 
     // Check that the window was successfully created
-    if (window == NULL) {
+    if(window == NULL) {
         // In the case that the window could not be made...
         printf("Could not create window: %s\n", SDL_GetError());
         return 1;
@@ -239,7 +244,8 @@ int pauseMenu(){
 	SDL_Rect startDestRect = {w/2 - startTextW/2, h/2 - startTextH/2, startTextW, startTextH};
 
 	bool done = false;
-	while (!done) {
+
+	while (!done){
         SDL_Event e;
 		
 		int x, y;
@@ -249,12 +255,12 @@ int pauseMenu(){
 
 		buttons = SDL_GetMouseState(&x, &y);
 
-        if (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT){ 
+        if(SDL_PollEvent(&e)){
+			if(e.type == SDL_QUIT){ 
 				done=true; 
 				break;
-			}else if(e.type == SDL_MOUSEBUTTONDOWN){
-			 	if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){	
+			} else if(e.type == SDL_MOUSEBUTTONDOWN){
+			 	if(x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){	
 					TTF_CloseFont(AovelSansRounded);
 					SDL_DestroyTexture(startButtonTexture);
 					SDL_FreeSurface(startButtonSurface);
@@ -275,12 +281,12 @@ int pauseMenu(){
 		SDL_RenderClear(ren);
 	
 		// handle mouseover start button
-		if (x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){
+		if(x > w/2 - startTextW/2 && y > h/2 - startTextH/2 && x < w/2 + startTextW/2 && y < h/2 + startTextH/2){
 			// set box color white
 			SDL_SetRenderDrawColor(ren, 255,255,255,255);
 			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Quit Game", black);
 			startButtonTexture = SDL_CreateTextureFromSurface(ren, startButtonSurface);
-		}else{
+		} else{
 			// set box color black
 			SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
 			startButtonSurface = TTF_RenderText_Solid(AovelSansRounded, "Quit Game", white);

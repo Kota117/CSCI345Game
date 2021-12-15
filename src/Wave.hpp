@@ -20,8 +20,6 @@ class Wave{
 	int size;
 	double decayRate;
 
-
-
 	public:
 	Wave(SDL_Renderer *newRen, int startX, int startY, double waveSpeed=100, double waveDamp=0.8,
 		double startColor=255, double newDecayRate=100, int newSize=3){
@@ -30,9 +28,9 @@ class Wave{
 		ren = newRen;
 		color = startColor;
 		decayRate = newDecayRate;
-		size=newSize;
+		size = newSize;
 
-		for(int i=0; i < 360; i++) {
+		for(int i=0; i < 360; i++){
 			//The accelerations for each sound particle are set at 0 on purpose
 			//Waves acceleration should not change!
             particles.push_back(new Particle(startX, startY, waveSpeed, i, 0.0, 0.0, waveDamp));
@@ -41,7 +39,7 @@ class Wave{
 	}
 	//bool waveLock=0;
 
-	Particle *operator[] (int index) {
+	Particle *operator[] (int index){
 		return particles[index];
 	}
 
@@ -56,23 +54,24 @@ class Wave{
 		
 		for(unsigned i=0; i<particles.size(); i++){
             particles[i]->update(dt);
-			
         }
 	}
 
 	void render(){
 		SDL_SetRenderDrawColor(ren, color, color, color, 255);
+
 		for(unsigned i=0; i<particles.size(); i++){
 			drawParticle(particles[i]->getX(), particles[i]->getY());
 		}
+
 		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
 	}
 
-	double getColor() { return color; }
+	double getColor(){ return color; }
 
 	~Wave(){
 		for (auto p:particles) 
-		  delete p;
+			delete p;
 	}
 };
 
@@ -83,11 +82,11 @@ class Waves{
 
 	public:
 	Waves(SDL_Renderer *newRen){
-		ren=newRen;
-		waveMutex= SDL_CreateMutex();
+		ren = newRen;
+		waveMutex = SDL_CreateMutex();
 	}
 
-	Wave *operator[] (int index) {
+	Wave *operator[] (int index){
 		return waves[index];
 	}
 
@@ -99,16 +98,17 @@ class Waves{
 			waves.push_back(new Wave(ren, startingX, startingY, waveSpeed, waveDamp, startColor, decayRate, size));
 			SDL_UnlockMutex(waveMutex);
 		}
+
 		Mix_PlayChannel(-1,sound,0);
 	}
 
-	void deleteWaves() {
+	void deleteWaves(){
 		//SDL_LockMutex(waveMutex);
 		while (waves.size()>0){ waves.erase(waves.begin());}
 		//SDL_UnlockMutex(waveMutex);
 	}
 
-	bool collideSound(Particle *newP) {
+	bool collideSound(Particle *newP){
 		bool hasCollision = false;
 		if(SDL_LockMutex(waveMutex)==0){
 			for(auto w:waves){
@@ -118,8 +118,10 @@ class Waves{
 					}
 				}
 			}
+
 			SDL_UnlockMutex(waveMutex);
 		}
+
 		return hasCollision;
 	}
 
@@ -144,6 +146,7 @@ class Waves{
 					}
 				}
 			}
+
 			SDL_UnlockMutex(waveMutex);
 		}
 	}
@@ -153,6 +156,7 @@ class Waves{
 			for(int i=waves.size()-1; i >=0; i--){
 				waves[i]->render();
 			}
+			
 			SDL_UnlockMutex(waveMutex);
 		}
 	}

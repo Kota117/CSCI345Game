@@ -2,33 +2,39 @@
 
 using namespace std;
 
-class MediaManager {
+class MediaManager{
 	map<string,SDL_Texture *> images;
 	map<string,Mix_Chunk *> samples;
 	SDL_Renderer *ren;
 
 	public:
-	MediaManager(SDL_Renderer *newRen) {
-		ren=newRen;
+	MediaManager(SDL_Renderer *newRen){
+		ren = newRen;
 	}
 
-    Mix_Chunk *readSound(string filename) {
+    Mix_Chunk *readSound(string filename){
 		//Sound files are assumed to be in .wav format
 		//This logic can be modified to auto detect filetype in the future
 		filename = "media/sounds/" + filename + ".wav";
-		if (samples.find(filename)==samples.end()) {
+
+		if (samples.find(filename)==samples.end()){
 			Mix_Chunk *sample;
-			sample=Mix_LoadWAV(filename.c_str());
+
+			sample = Mix_LoadWAV(filename.c_str());
+
 			if(!sample) throw Exception ("Mix_LoadWAV: " + filename);
-				samples[filename]=sample;
+				samples[filename] = sample;
 		}
+
 		return samples[filename];
 	}
 
-	SDL_Texture *readImage(string filename) {
+	SDL_Texture *readImage(string filename){
 		SDL_Texture *tex;
+
 		filename = "media/images/" + filename + ".bmp";
-		if(images.find(filename)==images.end()) {
+
+		if(images.find(filename)==images.end()){
 			SDL_Surface *ob;
 			
 			ob = SDL_LoadBMP(filename.c_str());
@@ -41,13 +47,13 @@ class MediaManager {
 			
 			SDL_FreeSurface(ob);
 			
-			images[filename]=tex;
+			images[filename] = tex;
 		}
 		
 		return images[filename];
 	}
 
-	~MediaManager() {
+	~MediaManager(){
 		for(auto i:images)	SDL_DestroyTexture(i.second);
 	    for(auto i:samples)	Mix_FreeChunk(i.second);
 	}

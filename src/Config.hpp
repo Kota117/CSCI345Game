@@ -41,7 +41,7 @@ class Config{
             cfg[key] = value;
             key = "";
             value = "";
-            isKey=true;
+            isKey = true;
 		}
 	}
 
