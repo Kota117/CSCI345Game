@@ -115,16 +115,6 @@ class MyGame:public Game{
 		SDL_RenderPresent(ren);
 	}
 
-	/*void handleKeyUp(SDL_Event keyEvent) {
-		if (keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT ||
-			keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT
-		){
-			player->stopMoving();
-		}
-		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
-	}
-	*/
-
 	void handleKeyUp(SDL_Event keyEvent){
 		switch(keyEvent.key.keysym.sym){
 			case SDLK_LEFT:
@@ -182,37 +172,6 @@ class MyGame:public Game{
 				break;
 		}
 	}
-	/*void handleKeyDown(SDL_Event keyEvent) {
-		if(!player->isMoving()){
-			if(keyEvent.key.keysym.sym==SDLK_a || keyEvent.key.keysym.sym==SDLK_LEFT)
-				player->moveLeft();
-			else if(keyEvent.key.keysym.sym==SDLK_d || keyEvent.key.keysym.sym==SDLK_RIGHT)
-				player->moveRight();
-
-			else if(keyEvent.key.keysym.sym==SDLK_SPACE)
-				player->jump();
-		}
-
-		if(player->isMoving()){ //for jumping while moving
-			if(keyEvent.key.keysym.sym==SDLK_SPACE)
-				player->jump();
-		}
-		
-		if(keyEvent.key.keysym.sym==SDLK_e)
-			player->clap();
-		else if(keyEvent.key.keysym.sym==SDLK_1)
-			levelChange("level1");
-		else if(keyEvent.key.keysym.sym==SDLK_2)
-			levelChange("level2");
-		else if(keyEvent.key.keysym.sym==SDLK_m){
-			cout << "Pressed m\n";
-			pauseMenu();
-		}
-		// else if(keyEvent.key.keysym.sym==SDLK_3)
-		// 	levelChange(3);
-
-	}
-	*/
 
 	~MyGame(){
 		delete player;

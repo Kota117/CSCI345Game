@@ -37,7 +37,6 @@ class Wave{
 		 	particles[i]->setBound();
         }
 	}
-	//bool waveLock=0;
 
 	Particle *operator[] (int index){
 		return particles[index];
@@ -103,9 +102,7 @@ class Waves{
 	}
 
 	void deleteWaves(){
-		//SDL_LockMutex(waveMutex);
 		while (waves.size()>0){ waves.erase(waves.begin());}
-		//SDL_UnlockMutex(waveMutex);
 	}
 
 	bool collideSound(Particle *newP){
@@ -124,14 +121,7 @@ class Waves{
 
 		return hasCollision;
 	}
-
-/*	void lockWave(Wave *wave){
-		wave->waveLock=true;
-	}
-	void unlockWave(Wave *wave){
-		wave->waveLock=false;
-	}
-*/
+	
 	void updateWaves(double dt){
 		if(SDL_LockMutex(waveMutex)==0){
 			if(waves.size() > 0){

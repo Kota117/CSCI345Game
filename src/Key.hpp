@@ -25,31 +25,18 @@ class Key:public Character{
         currMove = STOP;
         time = 0;
     }
-/*
-    void collected(Player *player) {
-      waves->createWave(sounds["clap"],x+dest.w/2,y+dest.h/2);
-      player->collectedKey();
-      cout << "GOTCHA" << endl;
-    }
-*/
+
     bool collide(SDL_Rect* pDest){
         SDL_bool collision = SDL_HasIntersection(&dest, pDest);
+        
         if (collision){
             return true;
         }
 
         return false;
     }
-   
-   /* void ai(double dt, double playerX) {
-    if (x>playerX-1 && x<playerX+1) stopMoving();
-    else if (x < playerX) moveRight();
-    else moveLeft();
-  }
-  */
 
     void update(double dt, double playerX){
-        //ai(dt, playerX);
         Character::update(dt);
     }
 

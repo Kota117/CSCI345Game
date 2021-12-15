@@ -20,11 +20,11 @@ int mainMenu(){
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
         "Main Menu",                  // window title
-        SDL_WINDOWPOS_UNDEFINED,           // initial x position
-        SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        w,                               // width, in pixels
-        h,                               // height, in pixels
-        SDL_WINDOW_OPENGL                  // flags - see below
+        SDL_WINDOWPOS_UNDEFINED,      // initial x position
+        SDL_WINDOWPOS_UNDEFINED,      // initial y position
+        w,                            // width, in pixels
+        h,                            // height, in pixels
+        SDL_WINDOW_OPENGL             // flags - see below
     );
 
     // Check that the window was successfully created
@@ -209,11 +209,11 @@ int pauseMenu(){
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
         "Pause Menu",                  // window title
-        SDL_WINDOWPOS_UNDEFINED,           // initial x position
-        SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        w,                               // width, in pixels
-        h,                               // height, in pixels
-        SDL_WINDOW_OPENGL                  // flags - see below
+        SDL_WINDOWPOS_UNDEFINED,       // initial x position
+        SDL_WINDOWPOS_UNDEFINED,       // initial y position
+        w,                             // width, in pixels
+        h,                             // height, in pixels
+        SDL_WINDOW_OPENGL              // flags - see below
     );
 
     // Check that the window was successfully created

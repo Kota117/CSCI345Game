@@ -87,7 +87,7 @@ class Game {
 		SDL_WaitThread(renderThread,&retVal);
 	}
 
-	virtual void update(double dt/*s of elapsed time*/) = 0;
+	virtual void update(double dt /*s of elapsed time*/) = 0;
 	virtual void render() = 0;
 
 	virtual void handleKeyUp(SDL_Event key) = 0;

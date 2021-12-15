@@ -60,8 +60,6 @@ class Tile:public Particle{
           sounds[sound] = new Mix_Chunk();
           sounds[sound] = media->readSound(sound);
         }
-
-        //y = newy-dest.h;
         
         tileType = newType;
 
