@@ -96,8 +96,10 @@ public:
 
   bool collide(SDL_Rect* pDest) {
     SDL_bool collision = SDL_HasIntersection(&dest, pDest);
-    if (collision)  {
-      // lightUp();
+    if (collision){
+      if (tileType=="door"){
+        lightUp();
+      }
       return true;
     }
     return false;
