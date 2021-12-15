@@ -64,7 +64,7 @@ class Map {
   void placeTile(int x, int y, string type) {
     if(type=="player"){
       playerStartX=x;
-      playerStartY=y;
+      playerStartY=y+16;
     }else if(type=="basic" || type=="big"){
       spawnNpc(x, y+tileWidth, type);
     }else if(type!="empty"){
@@ -138,25 +138,6 @@ class Map {
 
     for (auto i:locations) npcs.erase(npcs.begin()+i);
   }
-  
-  void hitFloor(Player *player){
-    for (auto t:tiles) {
-      if (t->collide(player->getDest()) && (t->getType() == "floor")){
-        if(player->isInAir())
-          player->stopFalling();
-        player->setY(player->getY()-1);
-      }else if (t->collide(player->getDest()) && (t->getType() == "ceiling")){
-        player->setVY(0);
-        player->setY(player->getY()+1);
-      }
-    }
-  }
-
-  void onWall(Player *player) {
-    for (auto &t:tiles) {
-      if (t->collide(player->getDest())) player->hitWall(t);
-    }
-  }
 
   void update(double dt, Player *player) {
     bool hasCollision = false;
@@ -176,8 +157,9 @@ class Map {
         hasCollision=false;
       }
     }
-    onWall(player);
-    hitFloor(player);
+    //player->handleCollision(tiles, dt);
+    //player->setInAir(player->checkInAir(tiles));
+    player->collisions(tiles);
   }
 
   void render(Player *player){

@@ -26,6 +26,8 @@ protected:
   Animation *a;
   SDL_Rect dest;
   Waves *waves;
+  SDL_Point center;
+  
 
 public:
   Tile(MediaManager *newMedia, SDL_Renderer *newRen, Config *newCfg, string newType,
@@ -37,9 +39,12 @@ public:
     ren=newRen;
     media=newMedia;
     cfg=newCfg;
-    
+    x = newx;
+    y = newy;
     dest.w = stoi((*cfg)["width"]);
     dest.h = stoi((*cfg)["height"]);
+    center = {dest.w / 2, dest.h / 2};
+    
 
     vector<string> newAnimations = cfg->getMany("animations");
 		for(auto anim: newAnimations){
@@ -55,7 +60,7 @@ public:
 			sounds[sound] = media->readSound(sound);
     }
 
-    y = newy-dest.w;
+    //y = newy-dest.h;
     
     tileType = newType;
 
@@ -67,11 +72,17 @@ public:
 
   SDL_Rect *getDest() { return &dest; }
   string getType() { return tileType; }
+  double getX() { return x; }
+  double getY() { return y; }
+  double getW() { return dest.w; }
+  double getH() { return dest.h;}
+  double centerX(){ return center.x;}
+  double centerY(){ return center.y;}
   
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); y+=dest.w+1; }
+  void setFloor() { setAnimation(animations["floor"]); }
   void setCeiling() { setAnimation(animations["ceiling"]); }
   void setLWall() { setAnimation(animations["lWall"]); }
   void setRWall() { setAnimation(animations["rWall"]); }
@@ -86,6 +97,7 @@ public:
     }
     return false;
   }
+  
 
   void update(double dt) {
     if(a->getTransparency() > 0) a->decTransparency(1);
@@ -96,6 +108,10 @@ public:
 
   void render(){
     SDL_RenderCopy(ren, a->getTexture(), a->getFrame(), &dest);
+  }
+  bool inside(int x, int y) {
+    return (dest.x <= x && x <= dest.x + dest.w &&
+            dest.y <= y && y <= dest.y + dest.h);
   }
 
   ~Tile() {
