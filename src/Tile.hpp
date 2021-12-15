@@ -83,7 +83,7 @@ public:
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); y+=dest.h-5; }
+  void setFloor() { setAnimation(animations["floor"]); }
   void setCeiling() { setAnimation(animations["ceiling"]); }
   void setLWall() { setAnimation(animations["lWall"]); }
   void setRWall() { setAnimation(animations["rWall"]); }
