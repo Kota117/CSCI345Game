@@ -98,7 +98,9 @@ class Character:public Particle{
 			dir=RIGHT;
 			vx = baseSpeed;
 			theta = 0;
-			waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
+			if(onTile){
+				waves->createWave(sounds["footstep"], x+dest.w/2, y+dest.h);
+			}
 			setAnimation(animations["walkRight"]);
 		}
 	}
@@ -108,7 +110,9 @@ class Character:public Particle{
 			dir=LEFT;
 			vx = -baseSpeed;
 			theta = 180;
-			waves->createWave(sounds["footstep"], x+dest.w/4, y+dest.h);
+			if(onTile){
+				waves->createWave(sounds["footstep"], x+dest.w/4, y+dest.h);
+			}
 			setAnimation(animations["walkLeft"]);
 		}
 	}
