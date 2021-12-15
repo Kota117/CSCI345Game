@@ -280,9 +280,9 @@ class Character:public Particle{
 		bottomBox.y=dest.y+dest.h-7;
 		bottomBox.h=10;
 		bottomBox.w=dest.w-10;
-		leftBox.x=dest.x-1;
+		leftBox.x=dest.x-2;
 		leftBox.y=dest.y+4;
-		leftBox.w=5;
+		leftBox.w=8;
 		leftBox.h=dest.h-8;
 		rightBox.x=dest.x+dest.w-6;
 		rightBox.y=dest.y+4;
