@@ -31,7 +31,7 @@ class MyGame:public Game {
 	Player *player;
 
 	Map *level;
-	string currentLevel;
+	int currentLevel;
 
 	Mix_Chunk *backgroundMusic;
 
@@ -44,7 +44,7 @@ class MyGame:public Game {
 
 		waves = new Waves(ren);
 
-		currentLevel="level1";
+		currentLevel=1;
 		level = new Map(media, ren, waves, NULL);
 		level->initMap(currentLevel);
 
@@ -66,17 +66,17 @@ class MyGame:public Game {
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void levelChange(string levelName) {
+	void levelChange(int levelNum) {
 		Map *oldLevel = level;
 
 		Map *newLevel = new Map(media, ren, waves, NULL);
-		newLevel->initMap(levelName);
+		newLevel->initMap(levelNum);
 		level = newLevel;
 		player->setX(level->getStartX());
 		player->setY(level->getStartY());
 
 		delete oldLevel;
-		currentLevel = levelName;
+		currentLevel = levelNum;
 	}
 
 	void update(double dt) {
@@ -85,6 +85,10 @@ class MyGame:public Game {
 
 
 		tvStatic->update(dt);
+		if(player->unlockedDoor() && !player->leftTheBuilding()) { 
+			levelChange(currentLevel+1);
+			player->leave();
+			}
 	}
 
 	void render(){
@@ -150,13 +154,13 @@ class MyGame:public Game {
 				player->clap();
 				break;
 			case SDLK_1:
-				levelChange("level1");
+				levelChange(1);
 				break;
 			case SDLK_2:
-				levelChange("level2");
+				levelChange(2);
 				break;
 			case SDLK_3:
-				levelChange("level3");
+				levelChange(3);
 				break;
 			default:
 				break;

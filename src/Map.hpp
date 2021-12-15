@@ -91,7 +91,8 @@ class Map {
     keys.push_back(new Key(media, ren, waves, keyConfs[type],x, y));
   }
 
-  void initMap(string levelName) {
+  void initMap(int levelNum) {
+    string levelName= "level"+to_string(levelNum);
     ifstream inf("levels/"+levelName+".txt");
     string mapRow = "";
 

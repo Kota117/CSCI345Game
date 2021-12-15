@@ -28,7 +28,7 @@ class Character:public Particle{
 	double baseSpeed, jumpSpeed;
 	int timeMoving;
 	direction dir;
-	bool clapped, inAir, onTile, hasKey;
+	bool clapped, inAir, onTile, hasKey, unlocked, hasLeft;
 	protected:
 	Animation *a;
 	SDL_Rect dest;
@@ -54,8 +54,11 @@ class Character:public Particle{
 		clapped=false;
 		onTile=true;
 		hasKey=false;
+		unlocked=false;
+		hasLeft=false;
 		vx = newvx;
 		vy = newvy;
+		
 
 		dest.w = stoi((*cfg)["width"]) * stoi((*cfg)["scale"]);
 		dest.h = stoi((*cfg)["height"]) * stoi((*cfg)["scale"]);
@@ -118,10 +121,19 @@ class Character:public Particle{
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
 	}
+	void leave(){
+		hasLeft=true;
+	}
 	void collectedKey(){
 		cout << "BOO YAH!" << endl;
 		hasKey=true;
 		Mix_PlayChannel(-1,sounds["key"],0);
+	}
+	bool leftTheBuilding(){
+		return hasLeft;
+	}
+	bool unlockedDoor(){
+		return unlocked;
 	}
 
 	void stopFalling(){
@@ -271,8 +283,10 @@ class Character:public Particle{
 				if(!(t->getType()=="door")){
 					setVy(0);
 				}
-				else if(hasKey){
+				else if(!hasLeft && hasKey){
 					cout << "YOU GOT OUT!" << endl;
+					unlocked=true;
+					//hasLeft=true;
 				}
 				//ay = GRAVITY;
 			}
@@ -282,8 +296,10 @@ class Character:public Particle{
 					x = t->getX()+t->getW()+1;
 					vx=0;
 				}
-				else if(hasKey){
+				else if(!hasLeft && hasKey){
 					cout << "YOU GOT OUT!" << endl;
+					unlocked=true;
+					//hasLeft=true;
 				}
 			}
 			else if(t->collide(&rightBox) && vx > 0){
@@ -291,8 +307,10 @@ class Character:public Particle{
 					x = t->getX()-dest.w-1;
 					vx=0;
 				}
-				else if(hasKey){
+				else if(!hasLeft && hasKey){
 					cout << "YOU GOT OUT!" << endl;
+					unlocked=true;
+					//hasLeft=true;
 				}
 			}
 			else if(t->collide(&bottomBox)){
@@ -303,8 +321,10 @@ class Character:public Particle{
 					onTile=true;
 					break;
 				}
-				else if(hasKey){
+				else if(!hasLeft && hasKey){
 					cout << "YOU GOT OUT!" << endl;
+					unlocked=true;
+					//hasLeft=true;
 				}
 			}
 			onTile=false;
