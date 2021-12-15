@@ -295,6 +295,7 @@ class Character:public Particle{
 					setVy(0);
 				}
 				else if(!hasLeft && hasKey){
+					Mix_PlayChannel(-1,sounds["door"],0);
 					cout << "YOU GOT OUT!" << endl;
 					unlocked=true;
 					//hasLeft=true;
@@ -308,6 +309,7 @@ class Character:public Particle{
 					vx=0;
 				}
 				else if(!hasLeft && hasKey){
+					Mix_PlayChannel(-1,sounds["door"],0);
 					cout << "YOU GOT OUT!" << endl;
 					unlocked=true;
 					//hasLeft=true;
@@ -319,6 +321,7 @@ class Character:public Particle{
 					vx=0;
 				}
 				else if(!hasLeft && hasKey){
+					Mix_PlayChannel(-1,sounds["door"],0);
 					cout << "YOU GOT OUT!" << endl;
 					unlocked=true;
 					//hasLeft=true;
@@ -333,6 +336,7 @@ class Character:public Particle{
 					break;
 				}
 				else if(!hasLeft && hasKey){
+					Mix_PlayChannel(-1,sounds["door"],0);
 					cout << "YOU GOT OUT!" << endl;
 					unlocked=true;
 					//hasLeft=true;
