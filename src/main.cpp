@@ -16,9 +16,11 @@
 #include "Wave.hpp"
 #include "Player.hpp"
 #include "NPC.hpp"
+#include "Key.hpp"
 #include "Config.hpp"
 #include "Tile.hpp"
 #include "Map.hpp"
+
 
 using namespace std;
 
@@ -103,62 +105,61 @@ class MyGame:public Game {
 		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
 	}
 	*/
+
 	void handleKeyUp(SDL_Event keyEvent) {
-		if (keyEvent.type == SDL_KEYUP)
+		switch(keyEvent.key.keysym.sym)
 		{
-			switch(keyEvent.key.keysym.sym)
-			{
-				case SDLK_LEFT:
-					player->stopMoving();
-					break;
-				case SDLK_a:
-					player->stopMoving();
-					break;
-				case SDLK_RIGHT:
-					player->stopMoving();
-					break;
-				case SDLK_d:
-					player->stopMoving();
-					break;
-				case SDLK_e:
-					player->setClap(false);
-					break;
-			}
+			case SDLK_LEFT:
+				player->stopMoving();
+				break;
+			case SDLK_a:
+				player->stopMoving();
+				break;
+			case SDLK_RIGHT:
+				player->stopMoving();
+				break;
+			case SDLK_d:
+				player->stopMoving();
+				break;
+			case SDLK_e:
+				player->setClap(false);
+				break;
 		}
 	}
 	void handleKeyDown(SDL_Event keyEvent) {
-		if(keyEvent.type == SDL_KEYDOWN){
-			switch (keyEvent.key.keysym.sym)
-			{
-				case SDLK_LEFT:
-					player->moveLeft();
-					break;
-				case SDLK_a:
-					player->moveLeft();
-					break;
-				case SDLK_RIGHT:
-					player->moveRight();
-					break;
+		switch (keyEvent.key.keysym.sym)
+		{
+			case SDLK_LEFT:
+				player->moveLeft();
+				break;
+			case SDLK_a:
+				player->moveLeft();
+				break;
+			case SDLK_RIGHT:
+				player->moveRight();
+				break;
 				case SDLK_d:
-					player->moveRight();
-					break;
-				case SDLK_SPACE:
-					if(player->isOnTile()){
-						player->jump();
-					}
-					break;
-				case SDLK_e:
-					player->clap();
-					break;
-				case SDLK_1:
-					levelChange("level1");
-					break;
-				case SDLK_2:
-					levelChange("level2");
-					break;
-				default:
-					break;
-			}
+				player->moveRight();
+				break;
+			case SDLK_SPACE:
+				if(player->isOnTile()){
+					player->jump();
+				}
+				break;
+			case SDLK_e:
+				player->clap();
+				break;
+			case SDLK_1:
+				levelChange("level1");
+				break;
+			case SDLK_2:
+				levelChange("level2");
+				break;
+			case SDLK_3:
+				levelChange("level3");
+				break;
+			default:
+				break;
 		}
 	}
 	/*void handleKeyDown(SDL_Event keyEvent) {

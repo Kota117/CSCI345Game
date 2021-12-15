@@ -11,7 +11,7 @@ MACLIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_mixer
 WININCPATH=..\\SDL2-2.0.16\\x86_64-w64-mingw32
 WINMIXERPATH=..\\SDL2_mixer-2.0.4\\x86_64-w64-mingw32
 WINTTFPATH=..\\SDL2_ttf-2.0.15\\x86_64-w64-mingw32
-WINFLAGS="-I$(WININCPATH)\\include\\SDL2" "-I$(WINMIXERPATH)\\include\\SDL2" "-I$(WINTTFPATH)\\include\SDL2"
+WINFLAGS="-I$(WININCPATH)\\include\\SDL2" "-I$(WINMIXERPATH)\\include\\SDL2" "-I$(WINTTFPATH)\\include\\SDL2"
 WINLIBS="-L$(WININCPATH)\\lib" "-L$(WINMIXERPATH)\\lib" "-L$(WINTTFPATH)\\lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf
 
 WININC32PATH=..\\SDL2-2.0.16\\i686-w64-mingw32

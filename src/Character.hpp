@@ -28,7 +28,7 @@ class Character:public Particle{
 	double baseSpeed, jumpSpeed;
 	int timeMoving;
 	direction dir;
-	bool clapped, inAir, onTile;
+	bool clapped, inAir, onTile, hasKey;
 	protected:
 	Animation *a;
 	SDL_Rect dest;
@@ -53,6 +53,7 @@ class Character:public Particle{
 		dir=STOP;
 		clapped=false;
 		onTile=true;
+		hasKey=false;
 		vx = newvx;
 		vy = newvy;
 
@@ -116,6 +117,11 @@ class Character:public Particle{
 			timeMoving=0;
 			setAnimation(animations[(*cfg)["defaultAnimation"]]);
 		}
+	}
+	void collectedKey(){
+		cout << "BOO YAH!" << endl;
+		hasKey=true;
+		Mix_PlayChannel(-1,sounds["key"],0);
 	}
 
 	void stopFalling(){
@@ -214,7 +220,7 @@ class Character:public Particle{
 		onTile=false;
 
 		setAnimation(animations["jump"]);
-		waves->createWave(sounds["footstep"], x+32, y+32);
+		//waves->createWave(sounds["footstep"], x+32, y+32);
 	}
 
 	/*void collisions(vector<Tile *> tiles) {	
@@ -255,31 +261,51 @@ class Character:public Particle{
 		leftBox.y=dest.y+4;
 		leftBox.w=5;
 		leftBox.h=dest.h-8;
-		rightBox.x=dest.x+dest.w-4;
+		rightBox.x=dest.x+dest.w-6;
 		rightBox.y=dest.y+4;
-		rightBox.w=5;
+		rightBox.w=8;
 		rightBox.h=dest.h-8;
 
 		for(auto &t:tiles) {
 			if(t->collide(&topBox) && vy < 0){
-				setVy(0);
+				if(!(t->getType()=="door")){
+					setVy(0);
+				}
+				else if(hasKey){
+					cout << "YOU GOT OUT!" << endl;
+				}
 				//ay = GRAVITY;
 			}
 
 			else if(t->collide(&leftBox) && vx < 0){
-				x = t->getX()+t->getW()+1;
-				vx=0;
+				if(!(t->getType()=="door")){
+					x = t->getX()+t->getW()+1;
+					vx=0;
+				}
+				else if(hasKey){
+					cout << "YOU GOT OUT!" << endl;
+				}
 			}
 			else if(t->collide(&rightBox) && vx > 0){
-				x = t->getX()-dest.w-1;
-				vx=0;
+				if(!(t->getType()=="door")){
+					x = t->getX()-dest.w-1;
+					vx=0;
+				}
+				else if(hasKey){
+					cout << "YOU GOT OUT!" << endl;
+				}
 			}
 			else if(t->collide(&bottomBox)){
-				//stopFalling();
-				if(vy>0) waves->createWave(sounds["footstep"], x, y+(dest.h-3));
-				y = t->getY()-dest.h;
-				onTile=true;
-				break;
+				if(!(t->getType()=="door")){
+					//stopFalling();
+					if(vy>0) waves->createWave(sounds["footstep"], x, y+(dest.h-3));
+					y = t->getY()-dest.h;
+					onTile=true;
+					break;
+				}
+				else if(hasKey){
+					cout << "YOU GOT OUT!" << endl;
+				}
 			}
 			onTile=false;
 		}
@@ -332,6 +358,10 @@ class Character:public Particle{
 					waves->createWave(sounds["footstep"], x+dest.w/2, y+(dest.h-3));
 				}
 			}
+			else if(isOnTile()){
+				setAnimation(animations[(*cfg)["defaultAnimation"]]);
+			}
+
 
 		if(vx!=0) timeMoving += (int)(dt*1000.0);
 		a->update(dt);
