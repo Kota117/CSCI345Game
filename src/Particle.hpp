@@ -46,7 +46,7 @@ class Particle {
 	void setY(double newY) { y=newY; }
 	double getY() { return y; }
 
-	getMaxY(){ return maxy; }
+	double getMaxY(){ return maxy; }
 
 	void setVY(double newVY) { vy=newVY; }
 
