@@ -89,6 +89,10 @@ class MyGame:public Game {
 			levelChange(currentLevel+1);
 			player->leave();
 			}
+		if(player->getY()>=player->getMaxY()){
+			player->setVY(0);
+			levelChange(currentLevel);
+		}
 	}
 
 	void render(){
