@@ -64,9 +64,9 @@ class Map {
   void placeTile(int x, int y, string type) {
     if(type=="player"){
       playerStartX=x;
-      playerStartY=y+16;
+      playerStartY=y;
     }else if(type=="basic" || type=="big"){
-      spawnNpc(x, y+tileWidth, type);
+      spawnNpc(x, y, type);
     }else if(type!="empty"){
       tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
     }
@@ -129,7 +129,10 @@ class Map {
   }
 
   void updateNpcs(double dt, Player *player) {
-    for (auto& e:npcs) e->update(dt, player->getX());
+    for (auto& e:npcs) {
+      e->update(dt, player->getX());
+      e->collisions(tiles);
+    }
 
     vector<int> locations;
     for (int i=0; i<npcs.size(); i++) {
@@ -144,12 +147,11 @@ class Map {
     waves->updateWaves(dt);
     
 		updateNpcs(dt, player);
-    if (rand()%1000==0) { 
-      lightning->update(dt,true,rand()%300+100);
-      for (auto t:tiles) t->lightUp(); 
+    if (rand()%1001==0) {
+      lightning->update(dt,tiles,true,rand()%300+100);
     }
-    else lightning->update(dt);
-		for (auto t:tiles){
+    else lightning->update(dt,tiles);
+		for (auto &t:tiles){
       t->update(dt);
       hasCollision = waves->collideSound(t);
       if(hasCollision){

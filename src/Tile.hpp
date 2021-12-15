@@ -82,7 +82,7 @@ public:
   Animation *getAnimation() { return a; }
   void setAnimation(Animation *newA) { a=newA; }
 
-  void setFloor() { setAnimation(animations["floor"]); }
+  void setFloor() { setAnimation(animations["floor"]); y+=dest.h-5; }
   void setCeiling() { setAnimation(animations["ceiling"]); }
   void setLWall() { setAnimation(animations["lWall"]); }
   void setRWall() { setAnimation(animations["rWall"]); }
@@ -92,7 +92,7 @@ public:
   bool collide(SDL_Rect* pDest) {
     SDL_bool collision = SDL_HasIntersection(&dest, pDest);
     if (collision)  {
-      lightUp();
+      // lightUp();
       return true;
     }
     return false;
