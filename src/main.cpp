@@ -16,10 +16,12 @@
 #include "Wave.hpp"
 #include "Player.hpp"
 #include "NPC.hpp"
+#include "Key.hpp"
 #include "Config.hpp"
 #include "Tile.hpp"
 #include "Map.hpp"
 #include "Menus.hpp"
+
 
 using namespace std;
 
@@ -30,7 +32,7 @@ class MyGame:public Game {
 	Player *player;
 
 	Map *level;
-	string currentLevel;
+	int currentLevel;
 
 	Mix_Chunk *backgroundMusic;
 
@@ -43,7 +45,7 @@ class MyGame:public Game {
 
 		waves = new Waves(ren);
 
-		currentLevel="level1";
+		currentLevel=1;
 		level = new Map(media, ren, waves, NULL);
 		level->initMap(currentLevel);
 
@@ -65,17 +67,17 @@ class MyGame:public Game {
 		SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	}
 
-	void levelChange(string levelName) {
+	void levelChange(int levelNum) {
 		Map *oldLevel = level;
 
 		Map *newLevel = new Map(media, ren, waves, NULL);
-		newLevel->initMap(levelName);
+		newLevel->initMap(levelNum);
 		level = newLevel;
 		player->setX(level->getStartX());
 		player->setY(level->getStartY());
 
 		delete oldLevel;
-		currentLevel = levelName;
+		currentLevel = levelNum;
 	}
 
 	void update(double dt) {
@@ -84,6 +86,14 @@ class MyGame:public Game {
 
 
 		tvStatic->update(dt);
+		if(player->unlockedDoor() && !player->leftTheBuilding()) { 
+			levelChange(currentLevel+1);
+			player->leave();
+			}
+		if(player->getY()>=player->getMaxY()){
+			player->setVY(0);
+			levelChange(currentLevel);
+		}
 	}
 
 	void render(){
@@ -104,6 +114,7 @@ class MyGame:public Game {
 		if (keyEvent.key.keysym.sym==SDLK_e) { player->setClap(false); }
 	}
 	*/
+
 	void handleKeyUp(SDL_Event keyEvent) {
 		switch(keyEvent.key.keysym.sym)
 		{
@@ -151,10 +162,13 @@ class MyGame:public Game {
 				pauseMenu();
 				break;
 			case SDLK_1:
-				levelChange("level1");
+				levelChange(1);
 				break;
 			case SDLK_2:
-				levelChange("level2");
+				levelChange(2);
+				break;
+			case SDLK_3:
+				levelChange(3);
 				break;
 			default:
 				break;

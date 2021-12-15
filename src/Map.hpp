@@ -11,9 +11,11 @@
 #include "Wave.hpp"
 #include "Player.hpp"
 #include "NPC.hpp"
+#include "Key.hpp"
 #include "Tile.hpp"
 #include "Config.hpp"
 #include "Lightning.hpp"
+
 
 class Map {
   Config *cfg;
@@ -24,6 +26,9 @@ class Map {
 
   map<string, Config *>npcConfs;
 	vector<Npc *>npcs;
+
+  map<string, Config *>keyConfs;
+  vector<Key *>keys;
 
 	map<string,Config *> tileConfs;
 	vector<Tile *>tiles;
@@ -50,6 +55,8 @@ class Map {
     tileConfs["tile"] = (new Config("tile"));
     tileWidth=stoi((*tileConfs["tile"])["width"]);
 
+    keyConfs["key"] = (new Config("key"));
+
     lightningConf = new Config("lightning");
     lightning=new Lightning(media, ren, lightningConf);
   }
@@ -64,9 +71,11 @@ class Map {
   void placeTile(int x, int y, string type) {
     if(type=="player"){
       playerStartX=x;
-      playerStartY=y;
+      playerStartY=y+16;
     }else if(type=="basic" || type=="big"){
-      spawnNpc(x, y, type);
+      spawnNpc(x, y+tileWidth, type);
+    }else if(type=="key"){
+        spawnKey(x, y+tileWidth, type);
     }else if(type!="empty"){
       tiles.push_back(new Tile(media, ren, tileConfs["tile"], type, x, y));
     }
@@ -75,8 +84,12 @@ class Map {
   void spawnNpc(int x, int y, string type) {
 		npcs.push_back(new Npc(media, ren, waves, npcConfs[type], x, y));
 	}
+  void spawnKey(int x, int y, string type) {
+    keys.push_back(new Key(media, ren, waves, keyConfs[type],x, y));
+  }
 
-  void initMap(string levelName) {
+  void initMap(int levelNum) {
+    string levelName= "level"+to_string(levelNum);
     ifstream inf("levels/"+levelName+".txt");
     string mapRow = "";
 
@@ -116,7 +129,12 @@ class Map {
           case 'b': //big enemy
             tileType="big";
             break;
-
+          case 'k':
+            tileType="key";
+            break;
+          case 'd':
+            tileType="door";
+            break;
           default:
             tileType="empty";
         }
@@ -142,11 +160,25 @@ class Map {
     for (auto i:locations) npcs.erase(npcs.begin()+i);
   }
 
+  void updateKey(double dt, Player *player) {
+    for (auto& k:keys) k->update(dt, player->getX());
+
+    vector<int> locations;
+    for (int i=0; i<keys.size(); i++) {
+      if(keys[i]->collide(player->getDest())){
+        locations.push_back(i-locations.size());
+        player->collectedKey();
+        }
+    }
+    for (auto i:locations) keys.erase(keys.begin()+i);
+  }
+
   void update(double dt, Player *player) {
     bool hasCollision = false;
     waves->updateWaves(dt);
     
 		updateNpcs(dt, player);
+    updateKey(dt, player);
     if (rand()%1001==0) {
       lightning->update(dt,tiles,true,rand()%300+100);
     }
@@ -166,10 +198,11 @@ class Map {
 
   void render(Player *player){
     waves->renderWaves();
+    for (auto t:tiles) t->render();
     player->render();
     lightning->render();
-    for (auto t:tiles) t->render();
     for (auto e:npcs) e->render();
+    for (auto k:keys) k->render();
   }
  
   ~Map() {

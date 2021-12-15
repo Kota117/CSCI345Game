@@ -68,6 +68,7 @@ public:
     else if (tileType == "ceiling") setCeiling();
     else if (tileType == "lWall") setLWall();
     else if (tileType == "rWall") setRWall();
+    else if (tileType == "door") setDoor();
   }
 
   SDL_Rect *getDest() { return &dest; }
@@ -86,6 +87,10 @@ public:
   void setCeiling() { setAnimation(animations["ceiling"]); }
   void setLWall() { setAnimation(animations["lWall"]); }
   void setRWall() { setAnimation(animations["rWall"]); }
+  void setDoor() { 
+    setAnimation(animations["door"]);
+    dest.h = 64;
+  }
   
   void lightUp() { a->setTransparency(255); }
 
